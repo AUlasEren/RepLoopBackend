@@ -11,4 +11,5 @@ public interface IIdentityService
     Task RevokeRefreshTokenAsync(string refreshToken);
     Task<(bool Found, string? ResetToken)> GeneratePasswordResetTokenAsync(string email);
     Task<(bool Success, string? Error)> ResetPasswordAsync(string email, string token, string newPassword);
+    Task<(bool Success, string? Error)> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword);
 }

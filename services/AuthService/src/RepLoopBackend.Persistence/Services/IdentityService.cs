@@ -147,6 +147,19 @@ public class IdentityService : IIdentityService
         return (true, null);
     }
 
+    public async Task<(bool Success, string? Error)> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            return (false, "Kullanıcı bulunamadı.");
+
+        var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        if (!result.Succeeded)
+            return (false, string.Join(", ", result.Errors.Select(e => e.Description)));
+
+        return (true, null);
+    }
+
     private static UserInfo ToUserInfo(ApplicationUser user) =>
         new(user.Id, user.Email!, user.DisplayName, user.AvatarUrl, user.IsProfileComplete);
 }

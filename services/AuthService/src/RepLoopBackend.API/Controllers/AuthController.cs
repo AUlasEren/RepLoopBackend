@@ -1,6 +1,8 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepLoopBackend.Application.Features.Auth.Commands.AppleAuth;
+using RepLoopBackend.Application.Features.Auth.Commands.ChangePassword;
 using RepLoopBackend.Application.Features.Auth.Commands.ForgotPassword;
 using RepLoopBackend.Application.Features.Auth.Commands.GoogleAuth;
 using RepLoopBackend.Application.Features.Auth.Commands.Login;
@@ -62,6 +64,25 @@ public class AuthController : ControllerBase
     {
         var result = await _mediator.Send(command);
         return Ok(result);
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+    {
+        try
+        {
+            await _mediator.Send(command);
+            return Ok(new { message = "Şifreniz başarıyla değiştirildi." });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(new { error = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
 
     [HttpPost("reset-password")]
