@@ -1,0 +1,59 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+_ReSharper*/
+*.ReSharper
+*.DotSettings.user
+[Tt]emp/
+[Ll]ogs/
+[Ll]og/
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/packages/
+packages/
+nuget.exe
+
+## Secrets & Environment
+*.env
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+## Docker
+.dockerignore
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+## IDE
+.idea/
+*.swp
+*.swo
+
+## Claude
+.claude/

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\RepLoopBackend.Domain\RepLoopBackend.Domain.csproj" />
+    <ProjectReference Include="..\RepLoopBackend.Application\RepLoopBackend.Application.csproj" />
+    <ProjectReference Include="..\RepLoopBackend.Infrastructure\RepLoopBackend.Infrastructure.csproj" />
+    <ProjectReference Include="..\RepLoopBackend.Persistence\RepLoopBackend.Persistence.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>
