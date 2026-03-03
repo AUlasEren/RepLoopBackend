@@ -1,5 +1,6 @@
 using MediatR;
 using RepLoopBackend.Application.Common.Interfaces;
+using RepLoopBackend.SharedKernel.Exceptions;
 
 namespace RepLoopBackend.Application.Features.Auth.Commands.ResetPassword;
 
@@ -18,6 +19,6 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand>
             request.Email, request.Token, request.NewPassword);
 
         if (!success)
-            throw new InvalidOperationException(error ?? "Şifre sıfırlama başarısız.");
+            throw new BadRequestException(ErrorCodes.ResetPasswordFailed, error ?? "Şifre sıfırlama başarısız.");
     }
 }

@@ -1,6 +1,7 @@
 using MediatR;
 using RepLoopBackend.Application.Common.Interfaces;
 using RepLoopBackend.Application.Common.Models;
+using RepLoopBackend.SharedKernel.Exceptions;
 
 namespace RepLoopBackend.Application.Features.Auth.Commands.Login;
 
@@ -20,7 +21,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResult>
         var (success, error, userInfo) = await _identityService.LoginAsync(request.Email, request.Password);
 
         if (!success || userInfo == null)
-            throw new InvalidOperationException(error ?? "Login failed.");
+            throw new BadRequestException(ErrorCodes.LoginFailed, error ?? "Giriş başarısız.");
 
         var accessToken = _jwtTokenService.GenerateToken(userInfo.Id, userInfo.Email);
         var refreshToken = await _identityService.CreateRefreshTokenAsync(userInfo.Id);

@@ -4,6 +4,7 @@
     <ProjectReference Include="..\SettingsService.Application\SettingsService.Application.csproj" />
     <ProjectReference Include="..\SettingsService.Infrastructure\SettingsService.Infrastructure.csproj" />
     <ProjectReference Include="..\SettingsService.Persistence\SettingsService.Persistence.csproj" />
+    <ProjectReference Include="..\..\..\Shared\RepLoopBackend.SharedKernel\RepLoopBackend.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

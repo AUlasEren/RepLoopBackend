@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using RepLoopBackend.SharedKernel.Exceptions;
 using WorkoutService.Application.Common.Interfaces;
 
 namespace WorkoutService.Application.Features.Workouts.Commands.UpdateWorkout;
@@ -22,7 +23,7 @@ public class UpdateWorkoutCommandHandler : IRequestHandler<UpdateWorkoutCommand>
 
         var workout = await _context.Workouts
             .FirstOrDefaultAsync(w => w.Id == request.Id && w.UserId == userId, ct)
-            ?? throw new KeyNotFoundException($"Workout {request.Id} not found.");
+            ?? throw new NotFoundException(ErrorCodes.WorkoutNotFound, "Workout", request.Id);
 
         workout.Name = request.Name;
         workout.Description = request.Description;

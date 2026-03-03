@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\WorkoutService.Domain\WorkoutService.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\RepLoopBackend.SharedKernel\RepLoopBackend.SharedKernel.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />

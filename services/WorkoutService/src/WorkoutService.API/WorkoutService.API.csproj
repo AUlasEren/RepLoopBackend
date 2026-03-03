@@ -8,6 +8,7 @@
     <ProjectReference Include="..\WorkoutService.Application\WorkoutService.Application.csproj" />
     <ProjectReference Include="..\WorkoutService.Infrastructure\WorkoutService.Infrastructure.csproj" />
     <ProjectReference Include="..\WorkoutService.Persistence\WorkoutService.Persistence.csproj" />
+    <ProjectReference Include="..\..\..\Shared\RepLoopBackend.SharedKernel\RepLoopBackend.SharedKernel.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />

@@ -1,6 +1,7 @@
 using MediatR;
 using RepLoopBackend.Application.Common.Interfaces;
 using RepLoopBackend.Application.Common.Models;
+using RepLoopBackend.SharedKernel.Exceptions;
 
 namespace RepLoopBackend.Application.Features.Auth.Commands.GoogleAuth;
 
@@ -25,13 +26,13 @@ public class GoogleAuthCommandHandler : IRequestHandler<GoogleAuthCommand, AuthR
         var googleUser = await _googleAuthService.VerifyTokenAsync(request.IdToken);
 
         if (googleUser == null)
-            throw new InvalidOperationException("Geçersiz Google token.");
+            throw new BadRequestException(ErrorCodes.InvalidGoogleToken, "Geçersiz Google token.");
 
         var (success, error, userInfo) = await _identityService.LoginOrCreateOAuthUserAsync(
             googleUser.Email, googleUser.Name, googleUser.AvatarUrl);
 
         if (!success || userInfo == null)
-            throw new InvalidOperationException(error ?? "Authentication failed.");
+            throw new BadRequestException(ErrorCodes.GoogleAuthFailed, error ?? "Google kimlik doğrulama başarısız.");
 
         var accessToken = _jwtTokenService.GenerateToken(userInfo.Id, userInfo.Email);
         var refreshToken = await _identityService.CreateRefreshTokenAsync(userInfo.Id);

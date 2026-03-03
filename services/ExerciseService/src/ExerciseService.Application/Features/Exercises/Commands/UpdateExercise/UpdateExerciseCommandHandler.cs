@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using RepLoopBackend.SharedKernel.Exceptions;
 using ExerciseService.Application.Common.Interfaces;
 
 namespace ExerciseService.Application.Features.Exercises.Commands.UpdateExercise;
@@ -16,7 +17,7 @@ public class UpdateExerciseCommandHandler : IRequestHandler<UpdateExerciseComman
     public async Task Handle(UpdateExerciseCommand request, CancellationToken ct)
     {
         var exercise = await _context.Exercises.FirstOrDefaultAsync(e => e.Id == request.Id, ct)
-            ?? throw new KeyNotFoundException($"Exercise {request.Id} not found.");
+            ?? throw new NotFoundException(ErrorCodes.ExerciseNotFound, "Exercise", request.Id);
 
         exercise.Name = request.Name;
         exercise.Description = request.Description;

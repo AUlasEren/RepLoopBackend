@@ -5,6 +5,7 @@
     <ProjectReference Include="..\RepLoopBackend.Application\RepLoopBackend.Application.csproj" />
     <ProjectReference Include="..\RepLoopBackend.Infrastructure\RepLoopBackend.Infrastructure.csproj" />
     <ProjectReference Include="..\RepLoopBackend.Persistence\RepLoopBackend.Persistence.csproj" />
+    <ProjectReference Include="..\..\..\Shared\RepLoopBackend.SharedKernel\RepLoopBackend.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

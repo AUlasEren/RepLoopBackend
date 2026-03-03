@@ -1,5 +1,6 @@
 using MediatR;
 using RepLoopBackend.Application.Common.Interfaces;
+using RepLoopBackend.SharedKernel.Exceptions;
 
 namespace RepLoopBackend.Application.Features.Auth.Commands.ChangePassword;
 
@@ -23,6 +24,6 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
             userId, request.CurrentPassword, request.NewPassword);
 
         if (!success)
-            throw new InvalidOperationException(error ?? "Şifre değiştirme başarısız.");
+            throw new BadRequestException(ErrorCodes.ChangePasswordFailed, error ?? "Şifre değiştirme başarısız.");
     }
 }

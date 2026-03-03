@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RepLoopBackend.Domain\RepLoopBackend.Domain.csproj" />
     <ProjectReference Include="..\..\..\Shared\RepLoopBackend.Contracts\RepLoopBackend.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Shared\RepLoopBackend.SharedKernel\RepLoopBackend.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

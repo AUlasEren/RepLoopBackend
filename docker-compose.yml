@@ -64,6 +64,19 @@ services:
       - settings_postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  session-db:
+    image: postgres:16-alpine
+    container_name: reploop-session-db
+    environment:
+      POSTGRES_DB: SessionDB
+      POSTGRES_USER: reploop
+      POSTGRES_PASSWORD: reploop123
+    ports:
+      - "5437:5432"
+    volumes:
+      - session_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: reploop-rabbitmq
@@ -91,4 +104,5 @@ volumes:
   exercise_postgres_data:
   user_postgres_data:
   settings_postgres_data:
+  session_postgres_data:
   rabbitmq_data:

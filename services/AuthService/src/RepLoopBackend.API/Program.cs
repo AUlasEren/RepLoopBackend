@@ -6,6 +6,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using RepLoopBackend.Application;
 using RepLoopBackend.Infrastructure;
 using RepLoopBackend.Persistence;
+using RepLoopBackend.SharedKernel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,8 @@ builder.Services.AddAuthentication(opts =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -63,6 +66,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
