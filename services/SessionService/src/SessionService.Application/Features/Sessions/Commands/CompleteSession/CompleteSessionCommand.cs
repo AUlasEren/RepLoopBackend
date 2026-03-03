@@ -4,6 +4,7 @@ namespace SessionService.Application.Features.Sessions.Commands.CompleteSession;
 
 public record CompleteSessionCommand : IRequest
 {
+    public Guid UserId { get; init; }
     public Guid Id { get; init; }
     public string? Notes { get; init; }
 }

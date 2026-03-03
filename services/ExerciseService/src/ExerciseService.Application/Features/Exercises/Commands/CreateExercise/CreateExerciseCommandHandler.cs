@@ -7,12 +7,10 @@ namespace ExerciseService.Application.Features.Exercises.Commands.CreateExercise
 public class CreateExerciseCommandHandler : IRequestHandler<CreateExerciseCommand, Guid>
 {
     private readonly IExerciseDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public CreateExerciseCommandHandler(IExerciseDbContext context, ICurrentUserService currentUserService)
+    public CreateExerciseCommandHandler(IExerciseDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(CreateExerciseCommand request, CancellationToken ct)
@@ -27,7 +25,7 @@ public class CreateExerciseCommandHandler : IRequestHandler<CreateExerciseComman
             VideoUrl = request.VideoUrl,
             ImageUrl = request.ImageUrl,
             IsPublic = request.IsPublic,
-            CreatedByUserId = _currentUserService.UserId
+            CreatedByUserId = request.CreatedByUserId
         };
 
         _context.Exercises.Add(exercise);

@@ -9,22 +9,17 @@ namespace SessionService.Application.Features.Sessions.Queries.GetSessionHistory
 public class GetSessionHistoryQueryHandler : IRequestHandler<GetSessionHistoryQuery, SessionHistoryDto>
 {
     private readonly ISessionDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public GetSessionHistoryQueryHandler(ISessionDbContext context, ICurrentUserService currentUserService)
+    public GetSessionHistoryQueryHandler(ISessionDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<SessionHistoryDto> Handle(GetSessionHistoryQuery request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException("User is not authenticated.");
-
         var query = _context.Sessions
             .Include(s => s.Sets)
-            .Where(s => s.UserId == userId && s.Status == SessionStatus.Completed)
+            .Where(s => s.UserId == request.UserId && s.Status == SessionStatus.Completed)
             .OrderByDescending(s => s.CompletedAt);
 
         var totalCount = await query.CountAsync(ct);

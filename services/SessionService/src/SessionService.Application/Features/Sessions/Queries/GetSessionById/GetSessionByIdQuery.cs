@@ -3,4 +3,4 @@ using SessionService.Application.Features.Sessions.Common;
 
 namespace SessionService.Application.Features.Sessions.Queries.GetSessionById;
 
-public record GetSessionByIdQuery(Guid Id) : IRequest<SessionDto?>;
+public record GetSessionByIdQuery(Guid Id, Guid UserId) : IRequest<SessionDto?>;

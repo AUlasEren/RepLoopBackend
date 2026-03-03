@@ -4,6 +4,7 @@ namespace SessionService.Application.Features.Sessions.Commands.LogSet;
 
 public record LogSetCommand : IRequest<Guid>
 {
+    public Guid UserId { get; init; }
     public Guid SessionId { get; init; }
     public Guid ExerciseId { get; init; }
     public string ExerciseName { get; init; } = string.Empty;

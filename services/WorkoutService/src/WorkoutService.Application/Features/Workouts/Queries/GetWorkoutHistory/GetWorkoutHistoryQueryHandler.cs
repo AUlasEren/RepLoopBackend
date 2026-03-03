@@ -8,22 +8,17 @@ namespace WorkoutService.Application.Features.Workouts.Queries.GetWorkoutHistory
 public class GetWorkoutHistoryQueryHandler : IRequestHandler<GetWorkoutHistoryQuery, WorkoutHistoryDto>
 {
     private readonly IWorkoutDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public GetWorkoutHistoryQueryHandler(IWorkoutDbContext context, ICurrentUserService currentUserService)
+    public GetWorkoutHistoryQueryHandler(IWorkoutDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<WorkoutHistoryDto> Handle(GetWorkoutHistoryQuery request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException();
-
         var query = _context.Workouts
             .Include(w => w.WorkoutExercises)
-            .Where(w => w.UserId == userId)
+            .Where(w => w.UserId == request.UserId)
             .OrderByDescending(w => w.CreatedAt);
 
         var totalCount = await query.CountAsync(ct);

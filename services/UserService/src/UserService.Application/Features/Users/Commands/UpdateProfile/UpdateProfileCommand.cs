@@ -11,4 +11,7 @@ public record UpdateProfileCommand(
     decimal? WeightKg,
     ExperienceLevel? ExperienceLevel,
     FitnessGoal? Goal
-) : IRequest<UserProfileDto>;
+) : IRequest<UserProfileDto>
+{
+    public Guid UserId { get; init; }
+}

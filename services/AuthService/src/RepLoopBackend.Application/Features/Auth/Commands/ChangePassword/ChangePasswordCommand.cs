@@ -2,4 +2,7 @@ using MediatR;
 
 namespace RepLoopBackend.Application.Features.Auth.Commands.ChangePassword;
 
-public record ChangePasswordCommand(string CurrentPassword, string NewPassword) : IRequest;
+public record ChangePasswordCommand(string CurrentPassword, string NewPassword) : IRequest
+{
+    public Guid UserId { get; init; }
+}

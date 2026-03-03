@@ -10,25 +10,20 @@ namespace SettingsService.Application.Features.Settings.Commands.UpdateNotificat
 public class UpdateNotificationSettingsCommandHandler : IRequestHandler<UpdateNotificationSettingsCommand, SettingsDto>
 {
     private readonly ISettingsDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public UpdateNotificationSettingsCommandHandler(ISettingsDbContext context, ICurrentUserService currentUserService)
+    public UpdateNotificationSettingsCommandHandler(ISettingsDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<SettingsDto> Handle(UpdateNotificationSettingsCommand request, CancellationToken cancellationToken)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException("Kullanıcı kimliği doğrulanamadı.");
-
         var settings = await _context.UserSettings
-            .FirstOrDefaultAsync(s => s.UserId == userId, cancellationToken);
+            .FirstOrDefaultAsync(s => s.UserId == request.UserId, cancellationToken);
 
         if (settings is null)
         {
-            settings = new UserSettings { UserId = userId };
+            settings = new UserSettings { UserId = request.UserId };
             _context.UserSettings.Add(settings);
         }
 

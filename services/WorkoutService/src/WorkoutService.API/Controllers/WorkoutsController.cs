@@ -10,10 +10,9 @@ using WorkoutService.Application.Features.Workouts.Queries.GetWorkouts;
 
 namespace WorkoutService.API.Controllers;
 
-[ApiController]
 [Route("api/workouts")]
 [Authorize]
-public class WorkoutsController : ControllerBase
+public class WorkoutsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -25,28 +24,28 @@ public class WorkoutsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _mediator.Send(new GetWorkoutsQuery());
+        var result = await _mediator.Send(new GetWorkoutsQuery(CurrentUserId));
         return Ok(result);
     }
 
     [HttpGet("history")]
     public async Task<IActionResult> GetHistory([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetWorkoutHistoryQuery(page, pageSize));
+        var result = await _mediator.Send(new GetWorkoutHistoryQuery(CurrentUserId, page, pageSize));
         return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await _mediator.Send(new GetWorkoutByIdQuery(id));
+        var result = await _mediator.Send(new GetWorkoutByIdQuery(id, CurrentUserId));
         return result is null ? NotFound() : Ok(result);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateWorkoutCommand command)
     {
-        var id = await _mediator.Send(command);
+        var id = await _mediator.Send(command with { UserId = CurrentUserId });
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
@@ -54,14 +53,14 @@ public class WorkoutsController : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateWorkoutCommand command)
     {
         if (id != command.Id) return BadRequest("ID mismatch.");
-        await _mediator.Send(command);
+        await _mediator.Send(command with { UserId = CurrentUserId });
         return NoContent();
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _mediator.Send(new DeleteWorkoutCommand(id));
+        await _mediator.Send(new DeleteWorkoutCommand(id, CurrentUserId));
         return NoContent();
     }
 }

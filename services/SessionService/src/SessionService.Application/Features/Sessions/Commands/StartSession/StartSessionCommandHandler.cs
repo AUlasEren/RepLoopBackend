@@ -7,22 +7,17 @@ namespace SessionService.Application.Features.Sessions.Commands.StartSession;
 public class StartSessionCommandHandler : IRequestHandler<StartSessionCommand, Guid>
 {
     private readonly ISessionDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public StartSessionCommandHandler(ISessionDbContext context, ICurrentUserService currentUserService)
+    public StartSessionCommandHandler(ISessionDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(StartSessionCommand request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException("User is not authenticated.");
-
         var session = new WorkoutSession
         {
-            UserId = userId,
+            UserId = request.UserId,
             WorkoutId = request.WorkoutId,
             WorkoutName = request.WorkoutName
         };

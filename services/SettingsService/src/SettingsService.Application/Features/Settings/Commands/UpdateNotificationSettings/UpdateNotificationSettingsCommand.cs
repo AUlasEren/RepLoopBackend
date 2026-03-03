@@ -9,4 +9,7 @@ public record UpdateNotificationSettingsCommand(
     bool? WorkoutReminders,
     bool? WeeklyReport,
     bool? AchievementAlerts
-) : IRequest<SettingsDto>;
+) : IRequest<SettingsDto>
+{
+    public Guid UserId { get; init; }
+}

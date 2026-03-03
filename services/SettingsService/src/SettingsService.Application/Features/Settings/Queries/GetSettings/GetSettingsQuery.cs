@@ -3,4 +3,4 @@ using SettingsService.Application.Features.Settings.Common;
 
 namespace SettingsService.Application.Features.Settings.Queries.GetSettings;
 
-public record GetSettingsQuery : IRequest<SettingsDto>;
+public record GetSettingsQuery(Guid UserId) : IRequest<SettingsDto>;

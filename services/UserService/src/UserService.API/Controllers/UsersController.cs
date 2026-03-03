@@ -8,10 +8,9 @@ using UserService.Application.Features.Users.Queries.GetProfile;
 
 namespace UserService.API.Controllers;
 
-[ApiController]
 [Route("api/user")]
 [Authorize]
-public class UsersController : ControllerBase
+public class UsersController : ApiControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -23,14 +22,14 @@ public class UsersController : ControllerBase
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
-        var result = await _mediator.Send(new GetProfileQuery());
+        var result = await _mediator.Send(new GetProfileQuery(CurrentUserId));
         return Ok(result);
     }
 
     [HttpPut("profile")]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommand command)
     {
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { UserId = CurrentUserId });
         return Ok(result);
     }
 
@@ -46,14 +45,14 @@ public class UsersController : ControllerBase
             return BadRequest(new { error = "Sadece JPEG, PNG ve WebP formatları desteklenir." });
 
         await using var stream = file.OpenReadStream();
-        var avatarUrl = await _mediator.Send(new UpdateAvatarCommand(stream, file.ContentType, file.FileName));
+        var avatarUrl = await _mediator.Send(new UpdateAvatarCommand(CurrentUserId, stream, file.ContentType, file.FileName));
         return Ok(new { avatarUrl });
     }
 
     [HttpDelete("account")]
     public async Task<IActionResult> DeleteAccount()
     {
-        await _mediator.Send(new DeleteAccountCommand());
+        await _mediator.Send(new DeleteAccountCommand(CurrentUserId));
         return NoContent();
     }
 }

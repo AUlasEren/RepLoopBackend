@@ -8,21 +8,16 @@ namespace WorkoutService.Application.Features.Workouts.Commands.UpdateWorkout;
 public class UpdateWorkoutCommandHandler : IRequestHandler<UpdateWorkoutCommand>
 {
     private readonly IWorkoutDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public UpdateWorkoutCommandHandler(IWorkoutDbContext context, ICurrentUserService currentUserService)
+    public UpdateWorkoutCommandHandler(IWorkoutDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task Handle(UpdateWorkoutCommand request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException();
-
         var workout = await _context.Workouts
-            .FirstOrDefaultAsync(w => w.Id == request.Id && w.UserId == userId, ct)
+            .FirstOrDefaultAsync(w => w.Id == request.Id && w.UserId == request.UserId, ct)
             ?? throw new NotFoundException(ErrorCodes.WorkoutNotFound, "Workout", request.Id);
 
         workout.Name = request.Name;

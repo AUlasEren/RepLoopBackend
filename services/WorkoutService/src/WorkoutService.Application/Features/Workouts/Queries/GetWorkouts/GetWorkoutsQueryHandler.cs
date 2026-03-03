@@ -8,22 +8,17 @@ namespace WorkoutService.Application.Features.Workouts.Queries.GetWorkouts;
 public class GetWorkoutsQueryHandler : IRequestHandler<GetWorkoutsQuery, List<WorkoutDto>>
 {
     private readonly IWorkoutDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public GetWorkoutsQueryHandler(IWorkoutDbContext context, ICurrentUserService currentUserService)
+    public GetWorkoutsQueryHandler(IWorkoutDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<List<WorkoutDto>> Handle(GetWorkoutsQuery request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException();
-
         var workouts = await _context.Workouts
             .Include(w => w.WorkoutExercises)
-            .Where(w => w.UserId == userId)
+            .Where(w => w.UserId == request.UserId)
             .OrderByDescending(w => w.CreatedAt)
             .ToListAsync(ct);
 

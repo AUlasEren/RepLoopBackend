@@ -7,19 +7,14 @@ namespace WorkoutService.Application.Features.Workouts.Commands.CreateWorkout;
 public class CreateWorkoutCommandHandler : IRequestHandler<CreateWorkoutCommand, Guid>
 {
     private readonly IWorkoutDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public CreateWorkoutCommandHandler(IWorkoutDbContext context, ICurrentUserService currentUserService)
+    public CreateWorkoutCommandHandler(IWorkoutDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(CreateWorkoutCommand request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException("User is not authenticated.");
-
         var workout = new Workout
         {
             Name = request.Name,
@@ -27,7 +22,7 @@ public class CreateWorkoutCommandHandler : IRequestHandler<CreateWorkoutCommand,
             Notes = request.Notes,
             ScheduledDate = request.ScheduledDate,
             DurationMinutes = request.DurationMinutes,
-            UserId = userId,
+            UserId = request.UserId,
             WorkoutExercises = request.Exercises.Select(e => new WorkoutExercise
             {
                 ExerciseId = e.ExerciseId,

@@ -9,9 +9,8 @@ using ExerciseService.Application.Features.Exercises.Queries.GetExercises;
 
 namespace ExerciseService.API.Controllers;
 
-[ApiController]
 [Route("api/exercises")]
-public class ExercisesController : ControllerBase
+public class ExercisesController : ApiControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -41,7 +40,7 @@ public class ExercisesController : ControllerBase
     [Authorize]
     public async Task<IActionResult> Create([FromBody] CreateExerciseCommand command)
     {
-        var id = await _mediator.Send(command);
+        var id = await _mediator.Send(command with { CreatedByUserId = CurrentUserId });
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 

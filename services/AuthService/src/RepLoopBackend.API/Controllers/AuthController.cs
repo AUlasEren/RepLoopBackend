@@ -12,11 +12,9 @@ using RepLoopBackend.Application.Features.Auth.Commands.ResetPassword;
 
 namespace RepLoopBackend.API.Controllers;
 
-[ApiController]
 [Route("api/auth")]
-public class AuthController : ControllerBase
+public class AuthController : ApiControllerBase
 {
- 
     private readonly IMediator _mediator;
 
     public AuthController(IMediator mediator)
@@ -70,32 +68,14 @@ public class AuthController : ControllerBase
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
     {
-        try
-        {
-            await _mediator.Send(command);
-            return Ok(new { message = "Şifreniz başarıyla değiştirildi." });
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            return Unauthorized(new { error = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        await _mediator.Send(command with { UserId = CurrentUserId });
+        return Ok(new { message = "Şifreniz başarıyla değiştirildi." });
     }
 
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
     {
-        try
-        {
-            await _mediator.Send(command);
-            return Ok(new { message = "Şifreniz başarıyla sıfırlandı." });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { error = ex.Message });
-        }
+        await _mediator.Send(command);
+        return Ok(new { message = "Şifreniz başarıyla sıfırlandı." });
     }
 }

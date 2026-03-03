@@ -8,21 +8,16 @@ namespace WorkoutService.Application.Features.Workouts.Commands.DeleteWorkout;
 public class DeleteWorkoutCommandHandler : IRequestHandler<DeleteWorkoutCommand>
 {
     private readonly IWorkoutDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public DeleteWorkoutCommandHandler(IWorkoutDbContext context, ICurrentUserService currentUserService)
+    public DeleteWorkoutCommandHandler(IWorkoutDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task Handle(DeleteWorkoutCommand request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException();
-
         var workout = await _context.Workouts
-            .FirstOrDefaultAsync(w => w.Id == request.Id && w.UserId == userId, ct)
+            .FirstOrDefaultAsync(w => w.Id == request.Id && w.UserId == request.UserId, ct)
             ?? throw new NotFoundException(ErrorCodes.WorkoutNotFound, "Workout", request.Id);
 
         _context.Workouts.Remove(workout);

@@ -10,21 +10,16 @@ namespace SessionService.Application.Features.Sessions.Commands.LogSet;
 public class LogSetCommandHandler : IRequestHandler<LogSetCommand, Guid>
 {
     private readonly ISessionDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public LogSetCommandHandler(ISessionDbContext context, ICurrentUserService currentUserService)
+    public LogSetCommandHandler(ISessionDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<Guid> Handle(LogSetCommand request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException("User is not authenticated.");
-
         var session = await _context.Sessions
-            .FirstOrDefaultAsync(s => s.Id == request.SessionId && s.UserId == userId, ct)
+            .FirstOrDefaultAsync(s => s.Id == request.SessionId && s.UserId == request.UserId, ct)
             ?? throw new NotFoundException(ErrorCodes.SessionNotFound, "Session", request.SessionId);
 
         if (session.Status != SessionStatus.Active && session.Status != SessionStatus.Paused)

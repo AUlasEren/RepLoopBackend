@@ -3,4 +3,4 @@ using UserService.Application.Features.Users.Common;
 
 namespace UserService.Application.Features.Users.Queries.GetProfile;
 
-public record GetProfileQuery : IRequest<UserProfileDto>;
+public record GetProfileQuery(Guid UserId) : IRequest<UserProfileDto>;

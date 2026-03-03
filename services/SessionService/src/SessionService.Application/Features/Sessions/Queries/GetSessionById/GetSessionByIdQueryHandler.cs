@@ -8,22 +8,17 @@ namespace SessionService.Application.Features.Sessions.Queries.GetSessionById;
 public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, SessionDto?>
 {
     private readonly ISessionDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public GetSessionByIdQueryHandler(ISessionDbContext context, ICurrentUserService currentUserService)
+    public GetSessionByIdQueryHandler(ISessionDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task<SessionDto?> Handle(GetSessionByIdQuery request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException("User is not authenticated.");
-
         var session = await _context.Sessions
             .Include(s => s.Sets)
-            .FirstOrDefaultAsync(s => s.Id == request.Id && s.UserId == userId, ct);
+            .FirstOrDefaultAsync(s => s.Id == request.Id && s.UserId == request.UserId, ct);
 
         if (session is null) return null;
 

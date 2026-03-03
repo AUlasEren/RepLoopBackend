@@ -9,21 +9,16 @@ namespace SessionService.Application.Features.Sessions.Commands.UpdateSession;
 public class UpdateSessionCommandHandler : IRequestHandler<UpdateSessionCommand>
 {
     private readonly ISessionDbContext _context;
-    private readonly ICurrentUserService _currentUserService;
 
-    public UpdateSessionCommandHandler(ISessionDbContext context, ICurrentUserService currentUserService)
+    public UpdateSessionCommandHandler(ISessionDbContext context)
     {
         _context = context;
-        _currentUserService = currentUserService;
     }
 
     public async Task Handle(UpdateSessionCommand request, CancellationToken ct)
     {
-        var userId = _currentUserService.UserId
-            ?? throw new UnauthorizedAccessException("User is not authenticated.");
-
         var session = await _context.Sessions
-            .FirstOrDefaultAsync(s => s.Id == request.Id && s.UserId == userId, ct)
+            .FirstOrDefaultAsync(s => s.Id == request.Id && s.UserId == request.UserId, ct)
             ?? throw new NotFoundException(ErrorCodes.SessionNotFound, "Session", request.Id);
 
         switch (request.Action)

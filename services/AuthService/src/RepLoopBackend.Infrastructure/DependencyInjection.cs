@@ -12,8 +12,6 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
-        services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IGoogleAuthService, GoogleAuthService>();
         services.AddScoped<IAppleAuthService, AppleAuthService>();
         services.AddScoped<IEventPublisher, EventPublisher>();

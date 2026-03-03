@@ -8,10 +8,9 @@ using SettingsService.Application.Features.Settings.Queries.GetSettings;
 
 namespace SettingsService.API.Controllers;
 
-[ApiController]
 [Route("api/settings")]
 [Authorize]
-public class SettingsController : ControllerBase
+public class SettingsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -23,28 +22,28 @@ public class SettingsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSettings()
     {
-        var result = await _mediator.Send(new GetSettingsQuery());
+        var result = await _mediator.Send(new GetSettingsQuery(CurrentUserId));
         return Ok(result);
     }
 
     [HttpPatch("workout")]
     public async Task<IActionResult> UpdateWorkoutSettings([FromBody] UpdateWorkoutSettingsCommand command)
     {
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { UserId = CurrentUserId });
         return Ok(result);
     }
 
     [HttpPatch("notifications")]
     public async Task<IActionResult> UpdateNotificationSettings([FromBody] UpdateNotificationSettingsCommand command)
     {
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { UserId = CurrentUserId });
         return Ok(result);
     }
 
     [HttpPatch("privacy")]
     public async Task<IActionResult> UpdatePrivacySettings([FromBody] UpdatePrivacySettingsCommand command)
     {
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command with { UserId = CurrentUserId });
         return Ok(result);
     }
 }

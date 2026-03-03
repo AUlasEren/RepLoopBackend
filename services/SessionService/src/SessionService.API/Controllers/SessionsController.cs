@@ -10,10 +10,9 @@ using SessionService.Application.Features.Sessions.Queries.GetSessionHistory;
 
 namespace SessionService.API.Controllers;
 
-[ApiController]
 [Route("api/sessions")]
 [Authorize]
-public class SessionsController : ControllerBase
+public class SessionsController : ApiControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -26,7 +25,7 @@ public class SessionsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Start([FromBody] StartSessionCommand command)
     {
-        var id = await _mediator.Send(command);
+        var id = await _mediator.Send(command with { UserId = CurrentUserId });
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
@@ -34,7 +33,7 @@ public class SessionsController : ControllerBase
     [HttpGet("history")]
     public async Task<IActionResult> GetHistory([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetSessionHistoryQuery(page, pageSize));
+        var result = await _mediator.Send(new GetSessionHistoryQuery(CurrentUserId, page, pageSize));
         return Ok(result);
     }
 
@@ -42,7 +41,7 @@ public class SessionsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await _mediator.Send(new GetSessionByIdQuery(id));
+        var result = await _mediator.Send(new GetSessionByIdQuery(id, CurrentUserId));
         return result is null ? NotFound() : Ok(result);
     }
 
@@ -52,6 +51,7 @@ public class SessionsController : ControllerBase
     {
         var command = new LogSetCommand
         {
+            UserId = CurrentUserId,
             SessionId = id,
             ExerciseId = request.ExerciseId,
             ExerciseName = request.ExerciseName,
@@ -69,7 +69,7 @@ public class SessionsController : ControllerBase
     [HttpPatch("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSessionRequest request)
     {
-        await _mediator.Send(new UpdateSessionCommand { Id = id, Action = request.Action });
+        await _mediator.Send(new UpdateSessionCommand { UserId = CurrentUserId, Id = id, Action = request.Action });
         return NoContent();
     }
 
@@ -77,7 +77,7 @@ public class SessionsController : ControllerBase
     [HttpPost("{id:guid}/complete")]
     public async Task<IActionResult> Complete(Guid id, [FromBody] CompleteSessionRequest? request)
     {
-        await _mediator.Send(new CompleteSessionCommand { Id = id, Notes = request?.Notes });
+        await _mediator.Send(new CompleteSessionCommand { UserId = CurrentUserId, Id = id, Notes = request?.Notes });
         return NoContent();
     }
 }
