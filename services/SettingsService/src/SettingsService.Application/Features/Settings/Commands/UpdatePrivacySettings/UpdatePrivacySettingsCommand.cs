@@ -5,7 +5,4 @@ namespace SettingsService.Application.Features.Settings.Commands.UpdatePrivacySe
 
 public record UpdatePrivacySettingsCommand(
     bool? AllowDataAnalysis
-) : IRequest<SettingsDto>
-{
-    public Guid UserId { get; init; }
-}
+) : IRequest<SettingsDto>;

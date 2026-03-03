@@ -68,7 +68,7 @@ public class AuthController : ApiControllerBase
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
     {
-        await _mediator.Send(command with { UserId = CurrentUserId });
+        await _mediator.Send(command);
         return Ok(new { message = "Şifreniz başarıyla değiştirildi." });
     }
 

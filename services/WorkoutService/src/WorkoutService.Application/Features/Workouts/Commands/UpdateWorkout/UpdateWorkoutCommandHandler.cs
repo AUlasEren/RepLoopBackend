@@ -1,32 +1,19 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using RepLoopBackend.SharedKernel.Exceptions;
 using WorkoutService.Application.Common.Interfaces;
 
 namespace WorkoutService.Application.Features.Workouts.Commands.UpdateWorkout;
 
 public class UpdateWorkoutCommandHandler : IRequestHandler<UpdateWorkoutCommand>
 {
-    private readonly IWorkoutDbContext _context;
+    private readonly WorkoutsManager _manager;
+    private readonly ICurrentUserService _currentUser;
 
-    public UpdateWorkoutCommandHandler(IWorkoutDbContext context)
+    public UpdateWorkoutCommandHandler(WorkoutsManager manager, ICurrentUserService currentUser)
     {
-        _context = context;
+        _manager = manager;
+        _currentUser = currentUser;
     }
 
-    public async Task Handle(UpdateWorkoutCommand request, CancellationToken ct)
-    {
-        var workout = await _context.Workouts
-            .FirstOrDefaultAsync(w => w.Id == request.Id && w.UserId == request.UserId, ct)
-            ?? throw new NotFoundException(ErrorCodes.WorkoutNotFound, "Workout", request.Id);
-
-        workout.Name = request.Name;
-        workout.Description = request.Description;
-        workout.Notes = request.Notes;
-        workout.ScheduledDate = request.ScheduledDate;
-        workout.DurationMinutes = request.DurationMinutes;
-        workout.UpdatedAt = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync(ct);
-    }
+    public Task Handle(UpdateWorkoutCommand request, CancellationToken ct)
+        => _manager.UpdateWorkoutAsync(request, _currentUser.UserId, ct);
 }

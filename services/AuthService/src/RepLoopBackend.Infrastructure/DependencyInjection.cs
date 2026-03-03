@@ -15,6 +15,8 @@ public static class DependencyInjection
         services.AddScoped<IGoogleAuthService, GoogleAuthService>();
         services.AddScoped<IAppleAuthService, AppleAuthService>();
         services.AddScoped<IEventPublisher, EventPublisher>();
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddHttpClient();
 
         services.AddMassTransit(x =>

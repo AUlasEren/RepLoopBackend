@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using UserService.Application.Common.Behaviors;
+using UserService.Application.Features.Users;
 
 namespace UserService.Application;
 
@@ -18,6 +19,7 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
+        services.AddScoped<UsersManager>();
 
         return services;
     }

@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using RepLoopBackend.Application.Common.Behaviors;
+using RepLoopBackend.Application.Features.Auth;
 
 namespace RepLoopBackend.Application;
 
@@ -19,6 +20,7 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
+        services.AddScoped<AuthManager>();
 
         return services;
     }

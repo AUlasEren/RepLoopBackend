@@ -1,46 +1,20 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using SettingsService.Application.Common.Interfaces;
 using SettingsService.Application.Features.Settings.Common;
-using SettingsService.Application.Features.Settings.Queries.GetSettings;
-using SettingsService.Domain.Entities;
 
 namespace SettingsService.Application.Features.Settings.Commands.UpdateNotificationSettings;
 
 public class UpdateNotificationSettingsCommandHandler : IRequestHandler<UpdateNotificationSettingsCommand, SettingsDto>
 {
-    private readonly ISettingsDbContext _context;
+    private readonly SettingsManager _manager;
+    private readonly ICurrentUserService _currentUser;
 
-    public UpdateNotificationSettingsCommandHandler(ISettingsDbContext context)
+    public UpdateNotificationSettingsCommandHandler(SettingsManager manager, ICurrentUserService currentUser)
     {
-        _context = context;
+        _manager = manager;
+        _currentUser = currentUser;
     }
 
-    public async Task<SettingsDto> Handle(UpdateNotificationSettingsCommand request, CancellationToken cancellationToken)
-    {
-        var settings = await _context.UserSettings
-            .FirstOrDefaultAsync(s => s.UserId == request.UserId, cancellationToken);
-
-        if (settings is null)
-        {
-            settings = new UserSettings { UserId = request.UserId };
-            _context.UserSettings.Add(settings);
-        }
-
-        if (request.EmailNotifications.HasValue)
-            settings.EmailNotifications = request.EmailNotifications.Value;
-        if (request.PushNotifications.HasValue)
-            settings.PushNotifications = request.PushNotifications.Value;
-        if (request.WorkoutReminders.HasValue)
-            settings.WorkoutReminders = request.WorkoutReminders.Value;
-        if (request.WeeklyReport.HasValue)
-            settings.WeeklyReport = request.WeeklyReport.Value;
-        if (request.AchievementAlerts.HasValue)
-            settings.AchievementAlerts = request.AchievementAlerts.Value;
-
-        settings.UpdatedAt = DateTime.UtcNow;
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return GetSettingsQueryHandler.ToDto(settings);
-    }
+    public Task<SettingsDto> Handle(UpdateNotificationSettingsCommand request, CancellationToken ct)
+        => _manager.UpdateNotificationSettingsAsync(request, _currentUser.UserId, ct);
 }

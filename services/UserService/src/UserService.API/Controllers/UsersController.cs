@@ -22,14 +22,14 @@ public class UsersController : ApiControllerBase
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
-        var result = await _mediator.Send(new GetProfileQuery(CurrentUserId));
+        var result = await _mediator.Send(new GetProfileQuery());
         return Ok(result);
     }
 
     [HttpPut("profile")]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommand command)
     {
-        var result = await _mediator.Send(command with { UserId = CurrentUserId });
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 
@@ -45,14 +45,14 @@ public class UsersController : ApiControllerBase
             return BadRequest(new { error = "Sadece JPEG, PNG ve WebP formatları desteklenir." });
 
         await using var stream = file.OpenReadStream();
-        var avatarUrl = await _mediator.Send(new UpdateAvatarCommand(CurrentUserId, stream, file.ContentType, file.FileName));
+        var avatarUrl = await _mediator.Send(new UpdateAvatarCommand(stream, file.ContentType, file.FileName));
         return Ok(new { avatarUrl });
     }
 
     [HttpDelete("account")]
     public async Task<IActionResult> DeleteAccount()
     {
-        await _mediator.Send(new DeleteAccountCommand(CurrentUserId));
+        await _mediator.Send(new DeleteAccountCommand());
         return NoContent();
     }
 }

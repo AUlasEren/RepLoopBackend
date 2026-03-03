@@ -1,25 +1,17 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using RepLoopBackend.SharedKernel.Exceptions;
 using ExerciseService.Application.Common.Interfaces;
 
 namespace ExerciseService.Application.Features.Exercises.Commands.DeleteExercise;
 
 public class DeleteExerciseCommandHandler : IRequestHandler<DeleteExerciseCommand>
 {
-    private readonly IExerciseDbContext _context;
+    private readonly ExercisesManager _manager;
 
-    public DeleteExerciseCommandHandler(IExerciseDbContext context)
+    public DeleteExerciseCommandHandler(ExercisesManager manager)
     {
-        _context = context;
+        _manager = manager;
     }
 
-    public async Task Handle(DeleteExerciseCommand request, CancellationToken ct)
-    {
-        var exercise = await _context.Exercises.FirstOrDefaultAsync(e => e.Id == request.Id, ct)
-            ?? throw new NotFoundException(ErrorCodes.ExerciseNotFound, "Exercise", request.Id);
-
-        _context.Exercises.Remove(exercise);
-        await _context.SaveChangesAsync(ct);
-    }
+    public Task Handle(DeleteExerciseCommand request, CancellationToken ct)
+        => _manager.DeleteExerciseAsync(request.Id, ct);
 }

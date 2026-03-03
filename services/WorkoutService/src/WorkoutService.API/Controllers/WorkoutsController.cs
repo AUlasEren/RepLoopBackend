@@ -24,28 +24,28 @@ public class WorkoutsController : ApiControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _mediator.Send(new GetWorkoutsQuery(CurrentUserId));
+        var result = await _mediator.Send(new GetWorkoutsQuery());
         return Ok(result);
     }
 
     [HttpGet("history")]
     public async Task<IActionResult> GetHistory([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetWorkoutHistoryQuery(CurrentUserId, page, pageSize));
+        var result = await _mediator.Send(new GetWorkoutHistoryQuery(page, pageSize));
         return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await _mediator.Send(new GetWorkoutByIdQuery(id, CurrentUserId));
+        var result = await _mediator.Send(new GetWorkoutByIdQuery(id));
         return result is null ? NotFound() : Ok(result);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateWorkoutCommand command)
     {
-        var id = await _mediator.Send(command with { UserId = CurrentUserId });
+        var id = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
@@ -53,14 +53,14 @@ public class WorkoutsController : ApiControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateWorkoutCommand command)
     {
         if (id != command.Id) return BadRequest("ID mismatch.");
-        await _mediator.Send(command with { UserId = CurrentUserId });
+        await _mediator.Send(command);
         return NoContent();
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _mediator.Send(new DeleteWorkoutCommand(id, CurrentUserId));
+        await _mediator.Send(new DeleteWorkoutCommand(id));
         return NoContent();
     }
 }

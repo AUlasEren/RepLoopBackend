@@ -10,7 +10,4 @@ public record UpdateWorkoutSettingsCommand(
     int? DefaultDurationMinutes,
     int? RestBetweenSetsSeconds,
     List<string>? WorkoutDays
-) : IRequest<SettingsDto>
-{
-    public Guid UserId { get; init; }
-}
+) : IRequest<SettingsDto>;

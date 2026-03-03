@@ -1,36 +1,19 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using RepLoopBackend.SharedKernel.Exceptions;
 using SessionService.Application.Common.Interfaces;
-using SessionService.Domain.Enums;
 
 namespace SessionService.Application.Features.Sessions.Commands.CompleteSession;
 
 public class CompleteSessionCommandHandler : IRequestHandler<CompleteSessionCommand>
 {
-    private readonly ISessionDbContext _context;
+    private readonly SessionsManager _manager;
+    private readonly ICurrentUserService _currentUser;
 
-    public CompleteSessionCommandHandler(ISessionDbContext context)
+    public CompleteSessionCommandHandler(SessionsManager manager, ICurrentUserService currentUser)
     {
-        _context = context;
+        _manager = manager;
+        _currentUser = currentUser;
     }
 
-    public async Task Handle(CompleteSessionCommand request, CancellationToken ct)
-    {
-        var session = await _context.Sessions
-            .FirstOrDefaultAsync(s => s.Id == request.Id && s.UserId == request.UserId, ct)
-            ?? throw new NotFoundException(ErrorCodes.SessionNotFound, "Session", request.Id);
-
-        if (session.Status == SessionStatus.Completed)
-            throw new ConflictException(ErrorCodes.SessionAlreadyCompleted, "Bu antrenman oturumu zaten tamamlanmış.");
-
-        var completedAt = DateTime.UtcNow;
-        session.Status = SessionStatus.Completed;
-        session.CompletedAt = completedAt;
-        session.TotalDurationSeconds = (int)(completedAt - session.StartedAt).TotalSeconds;
-        session.Notes = request.Notes ?? session.Notes;
-        session.UpdatedAt = completedAt;
-
-        await _context.SaveChangesAsync(ct);
-    }
+    public Task Handle(CompleteSessionCommand request, CancellationToken ct)
+        => _manager.CompleteSessionAsync(request, _currentUser.UserId, ct);
 }

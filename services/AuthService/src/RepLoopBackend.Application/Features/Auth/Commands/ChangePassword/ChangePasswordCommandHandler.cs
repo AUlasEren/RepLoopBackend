@@ -1,24 +1,19 @@
 using MediatR;
 using RepLoopBackend.Application.Common.Interfaces;
-using RepLoopBackend.SharedKernel.Exceptions;
 
 namespace RepLoopBackend.Application.Features.Auth.Commands.ChangePassword;
 
 public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand>
 {
-    private readonly IIdentityService _identityService;
+    private readonly AuthManager _manager;
+    private readonly ICurrentUserService _currentUser;
 
-    public ChangePasswordCommandHandler(IIdentityService identityService)
+    public ChangePasswordCommandHandler(AuthManager manager, ICurrentUserService currentUser)
     {
-        _identityService = identityService;
+        _manager = manager;
+        _currentUser = currentUser;
     }
 
-    public async Task Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
-    {
-        var (success, error) = await _identityService.ChangePasswordAsync(
-            request.UserId, request.CurrentPassword, request.NewPassword);
-
-        if (!success)
-            throw new BadRequestException(ErrorCodes.ChangePasswordFailed, error ?? "Şifre değiştirme başarısız.");
-    }
+    public Task Handle(ChangePasswordCommand request, CancellationToken ct)
+        => _manager.ChangePasswordAsync(request, _currentUser.UserId, ct);
 }

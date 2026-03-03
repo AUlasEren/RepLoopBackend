@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using WorkoutService.Application.Common.Interfaces;
 using WorkoutService.Application.Features.Workouts.Common;
 
@@ -7,21 +6,15 @@ namespace WorkoutService.Application.Features.Workouts.Queries.GetWorkouts;
 
 public class GetWorkoutsQueryHandler : IRequestHandler<GetWorkoutsQuery, List<WorkoutDto>>
 {
-    private readonly IWorkoutDbContext _context;
+    private readonly WorkoutsManager _manager;
+    private readonly ICurrentUserService _currentUser;
 
-    public GetWorkoutsQueryHandler(IWorkoutDbContext context)
+    public GetWorkoutsQueryHandler(WorkoutsManager manager, ICurrentUserService currentUser)
     {
-        _context = context;
+        _manager = manager;
+        _currentUser = currentUser;
     }
 
-    public async Task<List<WorkoutDto>> Handle(GetWorkoutsQuery request, CancellationToken ct)
-    {
-        var workouts = await _context.Workouts
-            .Include(w => w.WorkoutExercises)
-            .Where(w => w.UserId == request.UserId)
-            .OrderByDescending(w => w.CreatedAt)
-            .ToListAsync(ct);
-
-        return workouts.Select(w => w.ToDto()).ToList();
-    }
+    public Task<List<WorkoutDto>> Handle(GetWorkoutsQuery request, CancellationToken ct)
+        => _manager.GetWorkoutsAsync(_currentUser.UserId, ct);
 }

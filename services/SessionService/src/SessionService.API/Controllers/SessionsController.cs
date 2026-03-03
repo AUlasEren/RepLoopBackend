@@ -25,7 +25,7 @@ public class SessionsController : ApiControllerBase
     [HttpPost]
     public async Task<IActionResult> Start([FromBody] StartSessionCommand command)
     {
-        var id = await _mediator.Send(command with { UserId = CurrentUserId });
+        var id = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
@@ -33,7 +33,7 @@ public class SessionsController : ApiControllerBase
     [HttpGet("history")]
     public async Task<IActionResult> GetHistory([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        var result = await _mediator.Send(new GetSessionHistoryQuery(CurrentUserId, page, pageSize));
+        var result = await _mediator.Send(new GetSessionHistoryQuery(page, pageSize));
         return Ok(result);
     }
 
@@ -41,7 +41,7 @@ public class SessionsController : ApiControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await _mediator.Send(new GetSessionByIdQuery(id, CurrentUserId));
+        var result = await _mediator.Send(new GetSessionByIdQuery(id));
         return result is null ? NotFound() : Ok(result);
     }
 
@@ -51,7 +51,6 @@ public class SessionsController : ApiControllerBase
     {
         var command = new LogSetCommand
         {
-            UserId = CurrentUserId,
             SessionId = id,
             ExerciseId = request.ExerciseId,
             ExerciseName = request.ExerciseName,
@@ -69,7 +68,7 @@ public class SessionsController : ApiControllerBase
     [HttpPatch("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSessionRequest request)
     {
-        await _mediator.Send(new UpdateSessionCommand { UserId = CurrentUserId, Id = id, Action = request.Action });
+        await _mediator.Send(new UpdateSessionCommand { Id = id, Action = request.Action });
         return NoContent();
     }
 
@@ -77,7 +76,7 @@ public class SessionsController : ApiControllerBase
     [HttpPost("{id:guid}/complete")]
     public async Task<IActionResult> Complete(Guid id, [FromBody] CompleteSessionRequest? request)
     {
-        await _mediator.Send(new CompleteSessionCommand { UserId = CurrentUserId, Id = id, Notes = request?.Notes });
+        await _mediator.Send(new CompleteSessionCommand { Id = id, Notes = request?.Notes });
         return NoContent();
     }
 }

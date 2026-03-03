@@ -22,28 +22,28 @@ public class SettingsController : ApiControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSettings()
     {
-        var result = await _mediator.Send(new GetSettingsQuery(CurrentUserId));
+        var result = await _mediator.Send(new GetSettingsQuery());
         return Ok(result);
     }
 
     [HttpPatch("workout")]
     public async Task<IActionResult> UpdateWorkoutSettings([FromBody] UpdateWorkoutSettingsCommand command)
     {
-        var result = await _mediator.Send(command with { UserId = CurrentUserId });
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 
     [HttpPatch("notifications")]
     public async Task<IActionResult> UpdateNotificationSettings([FromBody] UpdateNotificationSettingsCommand command)
     {
-        var result = await _mediator.Send(command with { UserId = CurrentUserId });
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 
     [HttpPatch("privacy")]
     public async Task<IActionResult> UpdatePrivacySettings([FromBody] UpdatePrivacySettingsCommand command)
     {
-        var result = await _mediator.Send(command with { UserId = CurrentUserId });
+        var result = await _mediator.Send(command);
         return Ok(result);
     }
 }

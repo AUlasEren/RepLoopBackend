@@ -1,29 +1,19 @@
 using MediatR;
 using SessionService.Application.Common.Interfaces;
-using SessionService.Domain.Entities;
 
 namespace SessionService.Application.Features.Sessions.Commands.StartSession;
 
 public class StartSessionCommandHandler : IRequestHandler<StartSessionCommand, Guid>
 {
-    private readonly ISessionDbContext _context;
+    private readonly SessionsManager _manager;
+    private readonly ICurrentUserService _currentUser;
 
-    public StartSessionCommandHandler(ISessionDbContext context)
+    public StartSessionCommandHandler(SessionsManager manager, ICurrentUserService currentUser)
     {
-        _context = context;
+        _manager = manager;
+        _currentUser = currentUser;
     }
 
-    public async Task<Guid> Handle(StartSessionCommand request, CancellationToken ct)
-    {
-        var session = new WorkoutSession
-        {
-            UserId = request.UserId,
-            WorkoutId = request.WorkoutId,
-            WorkoutName = request.WorkoutName
-        };
-
-        _context.Sessions.Add(session);
-        await _context.SaveChangesAsync(ct);
-        return session.Id;
-    }
+    public Task<Guid> Handle(StartSessionCommand request, CancellationToken ct)
+        => _manager.StartSessionAsync(request, _currentUser.UserId, ct);
 }

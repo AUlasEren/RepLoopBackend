@@ -40,7 +40,7 @@ public class ExercisesController : ApiControllerBase
     [Authorize]
     public async Task<IActionResult> Create([FromBody] CreateExerciseCommand command)
     {
-        var id = await _mediator.Send(command with { CreatedByUserId = CurrentUserId });
+        var id = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 

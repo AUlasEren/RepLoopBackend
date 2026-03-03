@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using WorkoutService.Application.Common.Behaviors;
+using WorkoutService.Application.Features.Workouts;
 
 namespace WorkoutService.Application;
 
@@ -18,6 +19,7 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
+        services.AddScoped<WorkoutsManager>();
 
         return services;
     }

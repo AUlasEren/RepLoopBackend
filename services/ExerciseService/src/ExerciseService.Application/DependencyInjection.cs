@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using ExerciseService.Application.Common.Behaviors;
+using ExerciseService.Application.Features.Exercises;
 
 namespace ExerciseService.Application;
 
@@ -18,6 +19,7 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         });
+        services.AddScoped<ExercisesManager>();
 
         return services;
     }

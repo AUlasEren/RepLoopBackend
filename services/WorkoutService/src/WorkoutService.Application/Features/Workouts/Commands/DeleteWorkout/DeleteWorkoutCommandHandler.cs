@@ -1,26 +1,19 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using RepLoopBackend.SharedKernel.Exceptions;
 using WorkoutService.Application.Common.Interfaces;
 
 namespace WorkoutService.Application.Features.Workouts.Commands.DeleteWorkout;
 
 public class DeleteWorkoutCommandHandler : IRequestHandler<DeleteWorkoutCommand>
 {
-    private readonly IWorkoutDbContext _context;
+    private readonly WorkoutsManager _manager;
+    private readonly ICurrentUserService _currentUser;
 
-    public DeleteWorkoutCommandHandler(IWorkoutDbContext context)
+    public DeleteWorkoutCommandHandler(WorkoutsManager manager, ICurrentUserService currentUser)
     {
-        _context = context;
+        _manager = manager;
+        _currentUser = currentUser;
     }
 
-    public async Task Handle(DeleteWorkoutCommand request, CancellationToken ct)
-    {
-        var workout = await _context.Workouts
-            .FirstOrDefaultAsync(w => w.Id == request.Id && w.UserId == request.UserId, ct)
-            ?? throw new NotFoundException(ErrorCodes.WorkoutNotFound, "Workout", request.Id);
-
-        _context.Workouts.Remove(workout);
-        await _context.SaveChangesAsync(ct);
-    }
+    public Task Handle(DeleteWorkoutCommand request, CancellationToken ct)
+        => _manager.DeleteWorkoutAsync(request.Id, _currentUser.UserId, ct);
 }
