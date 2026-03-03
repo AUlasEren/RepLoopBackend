@@ -15,7 +15,6 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
         services.AddDbContext<ApplicationDbContext>(opts => opts.UseNpgsql(connectionString));
-        services.AddScoped<IApplicationDbContext>(p => p.GetRequiredService<ApplicationDbContext>());
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opts =>
         {
