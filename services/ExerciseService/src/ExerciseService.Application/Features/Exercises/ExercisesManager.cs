@@ -37,10 +37,13 @@ public class ExercisesManager
         return exercise.Id;
     }
 
-    public async Task UpdateExerciseAsync(UpdateExerciseCommand command, CancellationToken ct)
+    public async Task UpdateExerciseAsync(UpdateExerciseCommand command, Guid userId, CancellationToken ct)
     {
         var exercise = await _context.Exercises.FirstOrDefaultAsync(e => e.Id == command.Id, ct)
             ?? throw new NotFoundException(ErrorCodes.ExerciseNotFound, "Exercise", command.Id);
+
+        if (exercise.CreatedByUserId != userId)
+            throw new ForbiddenException(ErrorCodes.ExerciseForbidden);
 
         exercise.Name = command.Name;
         exercise.Description = command.Description;
@@ -55,10 +58,13 @@ public class ExercisesManager
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task DeleteExerciseAsync(Guid id, CancellationToken ct)
+    public async Task DeleteExerciseAsync(Guid id, Guid userId, CancellationToken ct)
     {
         var exercise = await _context.Exercises.FirstOrDefaultAsync(e => e.Id == id, ct)
             ?? throw new NotFoundException(ErrorCodes.ExerciseNotFound, "Exercise", id);
+
+        if (exercise.CreatedByUserId != userId)
+            throw new ForbiddenException(ErrorCodes.ExerciseForbidden);
 
         _context.Exercises.Remove(exercise);
         await _context.SaveChangesAsync(ct);
