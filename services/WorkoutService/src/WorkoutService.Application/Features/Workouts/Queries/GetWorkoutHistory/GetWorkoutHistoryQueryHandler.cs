@@ -30,27 +30,7 @@ public class GetWorkoutHistoryQueryHandler : IRequestHandler<GetWorkoutHistoryQu
 
         return new WorkoutHistoryDto
         {
-            Items = workouts.Select(w => new WorkoutDto
-            {
-                Id = w.Id,
-                Name = w.Name,
-                Description = w.Description,
-                Notes = w.Notes,
-                ScheduledDate = w.ScheduledDate,
-                DurationMinutes = w.DurationMinutes,
-                CreatedAt = w.CreatedAt,
-                Exercises = w.WorkoutExercises.Select(e => new WorkoutExerciseDto
-                {
-                    Id = e.Id,
-                    ExerciseId = e.ExerciseId,
-                    ExerciseName = e.ExerciseName,
-                    Sets = e.Sets,
-                    Reps = e.Reps,
-                    WeightKg = e.WeightKg,
-                    DurationSeconds = e.DurationSeconds,
-                    Notes = e.Notes
-                }).ToList()
-            }).ToList(),
+            Items = workouts.Select(w => w.ToDto()).ToList(),
             TotalCount = totalCount,
             Page = request.Page,
             PageSize = request.PageSize

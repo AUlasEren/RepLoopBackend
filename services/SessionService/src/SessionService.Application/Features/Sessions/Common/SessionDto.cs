@@ -1,5 +1,3 @@
-using SessionService.Domain.Enums;
-
 namespace SessionService.Application.Features.Sessions.Common;
 
 public class SessionDto
@@ -14,12 +12,4 @@ public class SessionDto
     public int? TotalDurationSeconds { get; set; }
     public string? Notes { get; set; }
     public List<SessionSetDto> Sets { get; set; } = new();
-}
-
-public class SessionHistoryDto
-{
-    public List<SessionDto> Items { get; set; } = new();
-    public int TotalCount { get; set; }
-    public int Page { get; set; }
-    public int PageSize { get; set; }
 }

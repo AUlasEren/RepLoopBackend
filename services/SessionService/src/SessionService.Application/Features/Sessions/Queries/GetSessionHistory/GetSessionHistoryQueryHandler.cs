@@ -31,30 +31,7 @@ public class GetSessionHistoryQueryHandler : IRequestHandler<GetSessionHistoryQu
 
         return new SessionHistoryDto
         {
-            Items = sessions.Select(s => new SessionDto
-            {
-                Id = s.Id,
-                WorkoutId = s.WorkoutId,
-                WorkoutName = s.WorkoutName,
-                Status = s.Status.ToString(),
-                StartedAt = s.StartedAt,
-                PausedAt = s.PausedAt,
-                CompletedAt = s.CompletedAt,
-                TotalDurationSeconds = s.TotalDurationSeconds,
-                Notes = s.Notes,
-                Sets = s.Sets.OrderBy(set => set.CompletedAt).Select(set => new SessionSetDto
-                {
-                    Id = set.Id,
-                    ExerciseId = set.ExerciseId,
-                    ExerciseName = set.ExerciseName,
-                    SetNumber = set.SetNumber,
-                    Reps = set.Reps,
-                    WeightKg = set.WeightKg,
-                    DurationSeconds = set.DurationSeconds,
-                    Notes = set.Notes,
-                    CompletedAt = set.CompletedAt
-                }).ToList()
-            }).ToList(),
+            Items = sessions.Select(s => s.ToDto()).ToList(),
             TotalCount = totalCount,
             Page = request.Page,
             PageSize = request.PageSize
