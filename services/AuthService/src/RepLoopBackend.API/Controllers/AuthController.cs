@@ -8,6 +8,7 @@ using RepLoopBackend.Application.Features.Auth.Commands.ForgotPassword;
 using RepLoopBackend.Application.Features.Auth.Commands.GoogleAuth;
 using RepLoopBackend.Application.Features.Auth.Commands.Login;
 using RepLoopBackend.Application.Features.Auth.Commands.Logout;
+using RepLoopBackend.Application.Features.Auth.Commands.RefreshToken;
 using RepLoopBackend.Application.Features.Auth.Commands.Register;
 using RepLoopBackend.Application.Features.Auth.Commands.ResetPassword;
 
@@ -32,6 +33,13 @@ public class AuthController : ApiControllerBase
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
     {
         var result = await _mediator.Send(command);
         return Ok(result);

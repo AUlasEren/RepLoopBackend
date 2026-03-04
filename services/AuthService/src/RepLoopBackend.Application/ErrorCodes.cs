@@ -11,4 +11,5 @@ public static class ErrorCodes
     public const string AppleAuthFailed         = "AUTH-1006";
     public const string ChangePasswordFailed    = "AUTH-1007";
     public const string ResetPasswordFailed     = "AUTH-1008";
+    public const string InvalidRefreshToken     = "AUTH-1009";
 }

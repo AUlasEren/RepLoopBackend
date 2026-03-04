@@ -111,6 +111,18 @@ public class IdentityService : IIdentityService
         return tokenValue;
     }
 
+    public async Task<UserInfo?> ValidateRefreshTokenAsync(string refreshToken)
+    {
+        var token = await _context.RefreshTokens
+            .Include(rt => rt.User)
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken && !rt.IsRevoked);
+
+        if (token == null || token.ExpiresAt <= DateTime.UtcNow)
+            return null;
+
+        return ToUserInfo(token.User);
+    }
+
     public async Task RevokeRefreshTokenAsync(string refreshToken)
     {
         var token = await _context.RefreshTokens
