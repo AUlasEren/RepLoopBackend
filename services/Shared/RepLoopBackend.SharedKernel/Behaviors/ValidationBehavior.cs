@@ -1,7 +1,7 @@
 using FluentValidation;
 using MediatR;
 
-namespace SessionService.Application.Common.Behaviors;
+namespace RepLoopBackend.SharedKernel.Behaviors;
 
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull

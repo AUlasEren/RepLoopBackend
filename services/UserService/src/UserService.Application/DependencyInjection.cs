@@ -1,7 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using UserService.Application.Common.Behaviors;
+using RepLoopBackend.SharedKernel.Behaviors;
 using UserService.Application.Features.Users;
 
 namespace UserService.Application;

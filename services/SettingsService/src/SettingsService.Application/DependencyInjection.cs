@@ -1,7 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using SettingsService.Application.Common.Behaviors;
+using RepLoopBackend.SharedKernel.Behaviors;
 using SettingsService.Application.Features.Settings;
 
 namespace SettingsService.Application;

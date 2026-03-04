@@ -2,11 +2,11 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using RepLoopBackend.Application;
 using RepLoopBackend.Infrastructure;
 using RepLoopBackend.Persistence;
 using RepLoopBackend.SharedKernel;
+using RepLoopBackend.SharedKernel.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,15 +73,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-class BearerSecurityDocumentFilter : IDocumentFilter
-{
-    public void Apply(OpenApiDocument document, DocumentFilterContext context)
-    {
-        document.Security ??= [];
-        document.Security.Add(new OpenApiSecurityRequirement
-        {
-            { new OpenApiSecuritySchemeReference("Bearer", document), [] }
-        });
-    }
-}

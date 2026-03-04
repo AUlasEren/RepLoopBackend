@@ -1,4 +1,5 @@
 using MediatR;
+using RepLoopBackend.SharedKernel.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SessionService.Application.Features.Sessions.Commands.CompleteSession;

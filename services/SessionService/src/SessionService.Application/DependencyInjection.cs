@@ -1,7 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using SessionService.Application.Common.Behaviors;
+using RepLoopBackend.SharedKernel.Behaviors;
 using SessionService.Application.Features.Sessions;
 
 namespace SessionService.Application;

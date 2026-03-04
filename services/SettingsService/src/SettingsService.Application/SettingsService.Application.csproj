@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SettingsService.Domain\SettingsService.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Shared\RepLoopBackend.SharedKernel\RepLoopBackend.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

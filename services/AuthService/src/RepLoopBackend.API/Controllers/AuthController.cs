@@ -1,4 +1,5 @@
 using MediatR;
+using RepLoopBackend.SharedKernel.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepLoopBackend.Application.Features.Auth.Commands.AppleAuth;

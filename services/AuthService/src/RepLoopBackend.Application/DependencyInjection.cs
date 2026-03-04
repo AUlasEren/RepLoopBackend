@@ -1,7 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using RepLoopBackend.Application.Common.Behaviors;
+using RepLoopBackend.SharedKernel.Behaviors;
 using RepLoopBackend.Application.Features.Auth;
 
 namespace RepLoopBackend.Application;

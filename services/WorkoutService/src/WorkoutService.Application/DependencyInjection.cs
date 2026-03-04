@@ -1,7 +1,7 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using WorkoutService.Application.Common.Behaviors;
+using RepLoopBackend.SharedKernel.Behaviors;
 using WorkoutService.Application.Features.Workouts;
 
 namespace WorkoutService.Application;

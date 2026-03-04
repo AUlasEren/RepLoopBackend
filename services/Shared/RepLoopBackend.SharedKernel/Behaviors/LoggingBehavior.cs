@@ -1,7 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace SettingsService.Application.Common.Behaviors;
+namespace RepLoopBackend.SharedKernel.Behaviors;
 
 public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : notnull
