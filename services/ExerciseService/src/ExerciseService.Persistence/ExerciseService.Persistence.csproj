@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="SeedData\exercises.json" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ExerciseService.Application\ExerciseService.Application.csproj" />
     <ProjectReference Include="..\ExerciseService.Domain\ExerciseService.Domain.csproj" />
   </ItemGroup>
