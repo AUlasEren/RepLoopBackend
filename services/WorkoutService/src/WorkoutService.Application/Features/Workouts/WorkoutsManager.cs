@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using RepLoopBackend.SharedKernel.Exceptions;
 using WorkoutService.Application.Common.Interfaces;
 using WorkoutService.Application.Features.Workouts.Commands.CreateWorkout;
+using WorkoutService.Application.Features.Workouts.Commands.DuplicateWorkout;
 using WorkoutService.Application.Features.Workouts.Commands.UpdateWorkout;
 using WorkoutService.Application.Features.Workouts.Common;
 using WorkoutService.Domain.Entities;
@@ -113,6 +114,37 @@ public class WorkoutsManager
             .FirstOrDefaultAsync(w => w.Id == id && w.UserId == userId, ct);
 
         return workout?.ToDto();
+    }
+
+    public async Task<Guid> DuplicateWorkoutAsync(DuplicateWorkoutCommand command, Guid userId, CancellationToken ct)
+    {
+        var original = await _context.Workouts
+            .Include(w => w.WorkoutExercises)
+            .FirstOrDefaultAsync(w => w.Id == command.Id && w.UserId == userId, ct)
+            ?? throw new NotFoundException(ErrorCodes.WorkoutNotFound, "Workout", command.Id);
+
+        var workout = new Workout
+        {
+            Name = command.Name ?? $"{original.Name} (Kopya)",
+            Description = original.Description,
+            Notes = original.Notes,
+            DurationMinutes = original.DurationMinutes,
+            UserId = userId,
+            WorkoutExercises = original.WorkoutExercises.Select(e => new WorkoutExercise
+            {
+                ExerciseId = e.ExerciseId,
+                ExerciseName = e.ExerciseName,
+                Sets = e.Sets,
+                Reps = e.Reps,
+                WeightKg = e.WeightKg,
+                DurationSeconds = e.DurationSeconds,
+                Notes = e.Notes
+            }).ToList()
+        };
+
+        _context.Workouts.Add(workout);
+        await _context.SaveChangesAsync(ct);
+        return workout.Id;
     }
 
     public async Task<WorkoutHistoryDto> GetWorkoutHistoryAsync(Guid userId, int page, int pageSize, CancellationToken ct)

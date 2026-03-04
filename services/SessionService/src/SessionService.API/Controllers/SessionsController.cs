@@ -2,10 +2,12 @@ using MediatR;
 using RepLoopBackend.SharedKernel.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SessionService.Application.Features.Sessions.Commands.AbandonSession;
 using SessionService.Application.Features.Sessions.Commands.CompleteSession;
 using SessionService.Application.Features.Sessions.Commands.LogSet;
 using SessionService.Application.Features.Sessions.Commands.StartSession;
 using SessionService.Application.Features.Sessions.Commands.UpdateSession;
+using SessionService.Application.Features.Sessions.Queries.GetActiveSession;
 using SessionService.Application.Features.Sessions.Queries.GetSessionById;
 using SessionService.Application.Features.Sessions.Queries.GetSessionHistory;
 
@@ -28,6 +30,14 @@ public class SessionsController : ApiControllerBase
     {
         var id = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id }, new { id });
+    }
+
+    // GET /api/sessions/active — Aktif veya duraklatılmış oturum
+    [HttpGet("active")]
+    public async Task<IActionResult> GetActive()
+    {
+        var result = await _mediator.Send(new GetActiveSessionQuery());
+        return result is null ? NotFound() : Ok(result);
     }
 
     // GET /api/sessions/history — Geçmiş antrenmanlar (sayfalı)
@@ -80,7 +90,17 @@ public class SessionsController : ApiControllerBase
         await _mediator.Send(new CompleteSessionCommand { Id = id, Notes = request?.Notes });
         return NoContent();
     }
+
+    // POST /api/sessions/:id/abandon — Antrenmanı terk et
+    [HttpPost("{id:guid}/abandon")]
+    public async Task<IActionResult> Abandon(Guid id, [FromBody] AbandonSessionRequest? request)
+    {
+        await _mediator.Send(new AbandonSessionCommand { Id = id, Notes = request?.Notes });
+        return NoContent();
+    }
 }
+
+public record AbandonSessionRequest(string? Notes);
 
 public record LogSetRequest(
     Guid ExerciseId,

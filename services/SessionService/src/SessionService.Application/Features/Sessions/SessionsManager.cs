@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RepLoopBackend.SharedKernel.Exceptions;
 using SessionService.Application.Common.Interfaces;
+using SessionService.Application.Features.Sessions.Commands.AbandonSession;
 using SessionService.Application.Features.Sessions.Commands.CompleteSession;
 using SessionService.Application.Features.Sessions.Commands.LogSet;
 using SessionService.Application.Features.Sessions.Commands.StartSession;
@@ -102,6 +103,35 @@ public class SessionsManager
         session.TotalDurationSeconds = (int)(completedAt - session.StartedAt).TotalSeconds;
         session.Notes = command.Notes ?? session.Notes;
         session.UpdatedAt = completedAt;
+
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task<SessionDto?> GetActiveSessionAsync(Guid userId, CancellationToken ct)
+    {
+        var session = await _context.Sessions
+            .Include(s => s.Sets)
+            .FirstOrDefaultAsync(s => s.UserId == userId
+                && (s.Status == SessionStatus.Active || s.Status == SessionStatus.Paused), ct);
+
+        return session?.ToDto();
+    }
+
+    public async Task AbandonSessionAsync(AbandonSessionCommand command, Guid userId, CancellationToken ct)
+    {
+        var session = await _context.Sessions
+            .FirstOrDefaultAsync(s => s.Id == command.Id && s.UserId == userId, ct)
+            ?? throw new NotFoundException(ErrorCodes.SessionNotFound, "Session", command.Id);
+
+        if (session.Status == SessionStatus.Completed || session.Status == SessionStatus.Abandoned)
+            throw new ConflictException(ErrorCodes.SessionAlreadyFinished, "Bu antrenman oturumu zaten tamamlanmış veya terk edilmiş.");
+
+        var now = DateTime.UtcNow;
+        session.Status = SessionStatus.Abandoned;
+        session.CompletedAt = now;
+        session.TotalDurationSeconds = (int)(now - session.StartedAt).TotalSeconds;
+        session.Notes = command.Notes ?? session.Notes;
+        session.UpdatedAt = now;
 
         await _context.SaveChangesAsync(ct);
     }

@@ -3,6 +3,7 @@ using RepLoopBackend.SharedKernel.Exceptions;
 using StatisticsService.Application.Common.Interfaces;
 using StatisticsService.Application.Features.Statistics.Commands.AddBodyMeasurement;
 using StatisticsService.Application.Features.Statistics.Commands.LogExercise;
+using StatisticsService.Application.Features.Statistics.Commands.UpdateBodyMeasurement;
 using StatisticsService.Application.Features.Statistics.Common;
 using StatisticsService.Domain.Entities;
 
@@ -110,6 +111,44 @@ public class StatisticsManager
         _context.BodyMeasurements.Add(measurement);
         await _context.SaveChangesAsync(ct);
         return measurement.Id;
+    }
+
+    public async Task DeleteBodyMeasurementAsync(Guid id, Guid userId, CancellationToken ct)
+    {
+        var measurement = await _context.BodyMeasurements
+            .FirstOrDefaultAsync(m => m.Id == id, ct)
+            ?? throw new NotFoundException(ErrorCodes.MeasurementNotFound, "BodyMeasurement", id);
+
+        if (measurement.UserId != userId)
+            throw new ForbiddenException(ErrorCodes.MeasurementForbidden);
+
+        _context.BodyMeasurements.Remove(measurement);
+        await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task<BodyMeasurementDto> UpdateBodyMeasurementAsync(
+        UpdateBodyMeasurementCommand command, Guid userId, CancellationToken ct)
+    {
+        var measurement = await _context.BodyMeasurements
+            .FirstOrDefaultAsync(m => m.Id == command.Id, ct)
+            ?? throw new NotFoundException(ErrorCodes.MeasurementNotFound, "BodyMeasurement", command.Id);
+
+        if (measurement.UserId != userId)
+            throw new ForbiddenException(ErrorCodes.MeasurementForbidden);
+
+        measurement.MeasuredAt = command.MeasuredAt;
+        measurement.WeightKg = command.WeightKg;
+        measurement.BodyFatPercentage = command.BodyFatPercentage;
+        measurement.ChestCm = command.ChestCm;
+        measurement.WaistCm = command.WaistCm;
+        measurement.HipsCm = command.HipsCm;
+        measurement.BicepsCm = command.BicepsCm;
+        measurement.ThighCm = command.ThighCm;
+        measurement.Notes = command.Notes;
+        measurement.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync(ct);
+        return measurement.ToDto();
     }
 
     public async Task<Guid> LogExerciseAsync(

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WorkoutService.Application.Features.Workouts.Commands.CreateWorkout;
 using WorkoutService.Application.Features.Workouts.Commands.DeleteWorkout;
+using WorkoutService.Application.Features.Workouts.Commands.DuplicateWorkout;
 using WorkoutService.Application.Features.Workouts.Commands.UpdateWorkout;
 using WorkoutService.Application.Features.Workouts.Queries.GetWorkoutById;
 using WorkoutService.Application.Features.Workouts.Queries.GetWorkoutHistory;
@@ -58,6 +59,13 @@ public class WorkoutsController : ApiControllerBase
         return NoContent();
     }
 
+    [HttpPost("{id:guid}/duplicate")]
+    public async Task<IActionResult> Duplicate(Guid id, [FromBody] DuplicateWorkoutRequest? request)
+    {
+        var newId = await _mediator.Send(new DuplicateWorkoutCommand { Id = id, Name = request?.Name });
+        return CreatedAtAction(nameof(GetById), new { id = newId }, new { id = newId });
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -65,3 +73,5 @@ public class WorkoutsController : ApiControllerBase
         return NoContent();
     }
 }
+
+public record DuplicateWorkoutRequest(string? Name);

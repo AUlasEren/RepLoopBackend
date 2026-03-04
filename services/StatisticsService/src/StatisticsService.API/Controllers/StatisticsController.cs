@@ -3,7 +3,9 @@ using RepLoopBackend.SharedKernel.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StatisticsService.Application.Features.Statistics.Commands.AddBodyMeasurement;
+using StatisticsService.Application.Features.Statistics.Commands.DeleteBodyMeasurement;
 using StatisticsService.Application.Features.Statistics.Commands.LogExercise;
+using StatisticsService.Application.Features.Statistics.Commands.UpdateBodyMeasurement;
 using StatisticsService.Application.Features.Statistics.Queries.GetBodyMeasurements;
 using StatisticsService.Application.Features.Statistics.Queries.GetPersonalRecords;
 using StatisticsService.Application.Features.Statistics.Queries.GetStrengthProgress;
@@ -49,6 +51,21 @@ public class StatisticsController : ApiControllerBase
     {
         var id = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetBodyMeasurements), new { id });
+    }
+
+    [HttpDelete("body-measurements/{id:guid}")]
+    public async Task<IActionResult> DeleteBodyMeasurement(Guid id)
+    {
+        await _mediator.Send(new DeleteBodyMeasurementCommand(id));
+        return NoContent();
+    }
+
+    [HttpPut("body-measurements/{id:guid}")]
+    public async Task<IActionResult> UpdateBodyMeasurement(Guid id, [FromBody] UpdateBodyMeasurementCommand command)
+    {
+        if (id != command.Id) return BadRequest("ID mismatch.");
+        var result = await _mediator.Send(command);
+        return Ok(result);
     }
 
     [HttpPost("exercise-logs")]

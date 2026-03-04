@@ -70,10 +70,12 @@ public class ExercisesManager
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<ExerciseListDto> GetExercisesAsync(string? muscleGroup, string? equipment, string? difficulty, int page, int pageSize, CancellationToken ct)
+    public async Task<ExerciseListDto> GetExercisesAsync(string? muscleGroup, string? equipment, string? difficulty, string? q, int page, int pageSize, CancellationToken ct)
     {
         var query = _context.Exercises.AsQueryable();
 
+        if (!string.IsNullOrWhiteSpace(q))
+            query = query.Where(e => e.Name.ToLower().Contains(q.ToLower()));
         if (!string.IsNullOrWhiteSpace(muscleGroup))
             query = query.Where(e => e.MuscleGroup == muscleGroup);
         if (!string.IsNullOrWhiteSpace(equipment))

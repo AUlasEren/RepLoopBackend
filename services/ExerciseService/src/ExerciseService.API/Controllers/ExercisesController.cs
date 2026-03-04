@@ -25,10 +25,11 @@ public class ExercisesController : ApiControllerBase
         [FromQuery] string? muscleGroup,
         [FromQuery] string? equipment,
         [FromQuery] string? difficulty,
+        [FromQuery] string? q,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20)
     {
-        var result = await _mediator.Send(new GetExercisesQuery(muscleGroup, equipment, difficulty, page, pageSize));
+        var result = await _mediator.Send(new GetExercisesQuery(muscleGroup, equipment, difficulty, q, page, pageSize));
         return Ok(result);
     }
 

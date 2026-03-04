@@ -7,5 +7,6 @@ public record GetExercisesQuery(
     string? MuscleGroup = null,
     string? Equipment = null,
     string? Difficulty = null,
+    string? Q = null,
     int Page = 1,
     int PageSize = 20) : IRequest<ExerciseListDto>;

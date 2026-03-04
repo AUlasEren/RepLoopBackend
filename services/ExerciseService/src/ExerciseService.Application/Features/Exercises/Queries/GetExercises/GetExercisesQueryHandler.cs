@@ -14,5 +14,5 @@ public class GetExercisesQueryHandler : IRequestHandler<GetExercisesQuery, Exerc
     }
 
     public Task<ExerciseListDto> Handle(GetExercisesQuery request, CancellationToken ct)
-        => _manager.GetExercisesAsync(request.MuscleGroup, request.Equipment, request.Difficulty, request.Page, request.PageSize, ct);
+        => _manager.GetExercisesAsync(request.MuscleGroup, request.Equipment, request.Difficulty, request.Q, request.Page, request.PageSize, ct);
 }

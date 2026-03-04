@@ -8,4 +8,5 @@ public static class ErrorCodes
     public const string PauseNotAllowed          = "SES-6003";
     public const string ResumeNotAllowed         = "SES-6004";
     public const string SessionAlreadyCompleted  = "SES-6005";
+    public const string SessionAlreadyFinished   = "SES-6006";
 }
