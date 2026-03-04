@@ -4,7 +4,7 @@ using WorkoutService.Application.Features.Workouts.Common;
 
 namespace WorkoutService.Application.Features.Workouts.Queries.GetWorkouts;
 
-public class GetWorkoutsQueryHandler : IRequestHandler<GetWorkoutsQuery, List<WorkoutDto>>
+public class GetWorkoutsQueryHandler : IRequestHandler<GetWorkoutsQuery, WorkoutListDto>
 {
     private readonly WorkoutsManager _manager;
     private readonly ICurrentUserService _currentUser;
@@ -15,6 +15,6 @@ public class GetWorkoutsQueryHandler : IRequestHandler<GetWorkoutsQuery, List<Wo
         _currentUser = currentUser;
     }
 
-    public Task<List<WorkoutDto>> Handle(GetWorkoutsQuery request, CancellationToken ct)
-        => _manager.GetWorkoutsAsync(_currentUser.UserId, ct);
+    public Task<WorkoutListDto> Handle(GetWorkoutsQuery request, CancellationToken ct)
+        => _manager.GetWorkoutsAsync(_currentUser.UserId, request.Page, request.PageSize, ct);
 }

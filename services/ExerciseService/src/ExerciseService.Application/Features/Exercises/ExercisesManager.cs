@@ -70,7 +70,7 @@ public class ExercisesManager
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<List<ExerciseDto>> GetExercisesAsync(string? muscleGroup, string? equipment, string? difficulty, CancellationToken ct)
+    public async Task<ExerciseListDto> GetExercisesAsync(string? muscleGroup, string? equipment, string? difficulty, int page, int pageSize, CancellationToken ct)
     {
         var query = _context.Exercises.AsQueryable();
 
@@ -81,21 +81,33 @@ public class ExercisesManager
         if (!string.IsNullOrWhiteSpace(difficulty))
             query = query.Where(e => e.Difficulty == difficulty);
 
-        var exercises = await query.OrderBy(e => e.Name).ToListAsync(ct);
+        var ordered = query.OrderBy(e => e.Name);
+        var totalCount = await ordered.CountAsync(ct);
 
-        return exercises.Select(e => new ExerciseDto
+        var exercises = await ordered
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        return new ExerciseListDto
         {
-            Id = e.Id,
-            Name = e.Name,
-            Description = e.Description,
-            MuscleGroup = e.MuscleGroup,
-            Equipment = e.Equipment,
-            Difficulty = e.Difficulty,
-            VideoUrl = e.VideoUrl,
-            ImageUrl = e.ImageUrl,
-            IsPublic = e.IsPublic,
-            CreatedAt = e.CreatedAt
-        }).ToList();
+            Items = exercises.Select(e => new ExerciseDto
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Description = e.Description,
+                MuscleGroup = e.MuscleGroup,
+                Equipment = e.Equipment,
+                Difficulty = e.Difficulty,
+                VideoUrl = e.VideoUrl,
+                ImageUrl = e.ImageUrl,
+                IsPublic = e.IsPublic,
+                CreatedAt = e.CreatedAt
+            }).ToList(),
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     public async Task<ExerciseDto?> GetExerciseByIdAsync(Guid id, CancellationToken ct)

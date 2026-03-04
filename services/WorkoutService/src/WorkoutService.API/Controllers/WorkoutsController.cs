@@ -23,9 +23,9 @@ public class WorkoutsController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
-        var result = await _mediator.Send(new GetWorkoutsQuery());
+        var result = await _mediator.Send(new GetWorkoutsQuery(page, pageSize));
         return Ok(result);
     }
 

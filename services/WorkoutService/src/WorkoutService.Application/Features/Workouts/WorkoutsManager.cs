@@ -83,15 +83,27 @@ public class WorkoutsManager
         await _context.SaveChangesAsync(ct);
     }
 
-    public async Task<List<WorkoutDto>> GetWorkoutsAsync(Guid userId, CancellationToken ct)
+    public async Task<WorkoutListDto> GetWorkoutsAsync(Guid userId, int page, int pageSize, CancellationToken ct)
     {
-        var workouts = await _context.Workouts
+        var query = _context.Workouts
             .Include(w => w.WorkoutExercises)
             .Where(w => w.UserId == userId)
-            .OrderByDescending(w => w.CreatedAt)
+            .OrderByDescending(w => w.CreatedAt);
+
+        var totalCount = await query.CountAsync(ct);
+
+        var workouts = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync(ct);
 
-        return workouts.Select(w => w.ToDto()).ToList();
+        return new WorkoutListDto
+        {
+            Items = workouts.Select(w => w.ToDto()).ToList(),
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
     }
 
     public async Task<WorkoutDto?> GetWorkoutByIdAsync(Guid id, Guid userId, CancellationToken ct)

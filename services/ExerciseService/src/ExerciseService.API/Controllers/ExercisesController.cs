@@ -24,9 +24,11 @@ public class ExercisesController : ApiControllerBase
     public async Task<IActionResult> GetAll(
         [FromQuery] string? muscleGroup,
         [FromQuery] string? equipment,
-        [FromQuery] string? difficulty)
+        [FromQuery] string? difficulty,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
     {
-        var result = await _mediator.Send(new GetExercisesQuery(muscleGroup, equipment, difficulty));
+        var result = await _mediator.Send(new GetExercisesQuery(muscleGroup, equipment, difficulty, page, pageSize));
         return Ok(result);
     }
 
