@@ -1,4 +1,5 @@
 using MediatR;
+using WorkoutService.Application.Features.Workouts.Common;
 
 namespace WorkoutService.Application.Features.Workouts.Commands.CreateWorkout;
 
@@ -9,5 +10,5 @@ public record CreateWorkoutCommand : IRequest<Guid>
     public string? Notes { get; init; }
     public DateTime? ScheduledDate { get; init; }
     public int? DurationMinutes { get; init; }
-    public List<CreateWorkoutExerciseItem> Exercises { get; init; } = new();
+    public List<WorkoutExerciseItem> Exercises { get; init; } = new();
 }

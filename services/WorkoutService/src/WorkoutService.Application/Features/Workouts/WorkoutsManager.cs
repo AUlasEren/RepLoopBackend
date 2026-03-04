@@ -47,6 +47,7 @@ public class WorkoutsManager
     public async Task UpdateWorkoutAsync(UpdateWorkoutCommand command, Guid userId, CancellationToken ct)
     {
         var workout = await _context.Workouts
+            .Include(w => w.WorkoutExercises)
             .FirstOrDefaultAsync(w => w.Id == command.Id && w.UserId == userId, ct)
             ?? throw new NotFoundException(ErrorCodes.WorkoutNotFound, "Workout", command.Id);
 
@@ -56,6 +57,18 @@ public class WorkoutsManager
         workout.ScheduledDate = command.ScheduledDate;
         workout.DurationMinutes = command.DurationMinutes;
         workout.UpdatedAt = DateTime.UtcNow;
+
+        _context.WorkoutExercises.RemoveRange(workout.WorkoutExercises);
+        workout.WorkoutExercises = command.Exercises.Select(e => new WorkoutExercise
+        {
+            ExerciseId = e.ExerciseId,
+            ExerciseName = e.ExerciseName,
+            Sets = e.Sets,
+            Reps = e.Reps,
+            WeightKg = e.WeightKg,
+            DurationSeconds = e.DurationSeconds,
+            Notes = e.Notes
+        }).ToList();
 
         await _context.SaveChangesAsync(ct);
     }

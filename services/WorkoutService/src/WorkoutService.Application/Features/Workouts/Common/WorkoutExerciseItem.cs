@@ -1,6 +1,6 @@
-namespace WorkoutService.Application.Features.Workouts.Commands.CreateWorkout;
+namespace WorkoutService.Application.Features.Workouts.Common;
 
-public record CreateWorkoutExerciseItem
+public record WorkoutExerciseItem
 {
     public Guid ExerciseId { get; init; }
     public string ExerciseName { get; init; } = string.Empty;
