@@ -5,7 +5,7 @@ services:
       dockerfile: ApiGateway/Dockerfile
     container_name: reploop-api-gateway
     ports:
-      - "5000:8080"
+      - "5001:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ReverseProxy__Clusters__auth-cluster__Destinations__destination1__Address: http://auth-service:8080
@@ -14,6 +14,8 @@ services:
       ReverseProxy__Clusters__user-cluster__Destinations__destination1__Address: http://user-service:8080
       ReverseProxy__Clusters__settings-cluster__Destinations__destination1__Address: http://settings-service:8080
       ReverseProxy__Clusters__session-cluster__Destinations__destination1__Address: http://session-service:8080
+      ReverseProxy__Clusters__statistics-cluster__Destinations__destination1__Address: http://statistics-service:8080
+      ReverseProxy__Clusters__recommender-cluster__Destinations__destination1__Address: http://recommender-service:8000
     depends_on:
       - auth-service
       - workout-service
@@ -21,6 +23,8 @@ services:
       - user-service
       - settings-service
       - session-service
+      - statistics-service
+      - recommender-service
     restart: unless-stopped
 
   auth-service:
@@ -121,6 +125,45 @@ services:
       JwtSettings__ExpirationMinutes: "60"
     depends_on:
       - settings-db
+    restart: unless-stopped
+
+  statistics-service:
+    build:
+      context: services
+      dockerfile: StatisticsService/Dockerfile
+    container_name: reploop-statistics-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=statistics-db;Port=5432;Database=StatisticsDB;Username=reploop;Password=reploop123
+      JwtSettings__SecretKey: RepLoopBackend-SuperSecret-Key-Min32Chars!!
+      JwtSettings__Issuer: RepLoopBackend
+      JwtSettings__Audience: RepLoopClients
+      JwtSettings__ExpirationMinutes: "60"
+    depends_on:
+      - statistics-db
+    restart: unless-stopped
+
+  recommender-service:
+    build:
+      context: services/reploop-recommender
+    container_name: reploop-recommender-service
+    environment:
+      WORKOUT_DB_HOST: workout-db
+      WORKOUT_DB_PORT: "5432"
+      WORKOUT_DB_NAME: WorkoutDB
+      EXERCISE_DB_HOST: exercise-db
+      EXERCISE_DB_PORT: "5432"
+      EXERCISE_DB_NAME: ExerciseDB
+      SESSION_DB_HOST: session-db
+      SESSION_DB_PORT: "5432"
+      SESSION_DB_NAME: SessionDB
+      DB_USER: reploop
+      DB_PASSWORD: reploop123
+      USE_MOCK_DB: "false"
+    depends_on:
+      - workout-db
+      - exercise-db
+      - session-db
     restart: unless-stopped
 
   mail-sender:
