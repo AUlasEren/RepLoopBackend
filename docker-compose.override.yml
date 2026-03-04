@@ -1,0 +1,143 @@
+services:
+  api-gateway:
+    build:
+      context: services
+      dockerfile: ApiGateway/Dockerfile
+    container_name: reploop-api-gateway
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ReverseProxy__Clusters__auth-cluster__Destinations__destination1__Address: http://auth-service:8080
+      ReverseProxy__Clusters__workout-cluster__Destinations__destination1__Address: http://workout-service:8080
+      ReverseProxy__Clusters__exercise-cluster__Destinations__destination1__Address: http://exercise-service:8080
+      ReverseProxy__Clusters__user-cluster__Destinations__destination1__Address: http://user-service:8080
+      ReverseProxy__Clusters__settings-cluster__Destinations__destination1__Address: http://settings-service:8080
+      ReverseProxy__Clusters__session-cluster__Destinations__destination1__Address: http://session-service:8080
+    depends_on:
+      - auth-service
+      - workout-service
+      - exercise-service
+      - user-service
+      - settings-service
+      - session-service
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: services
+      dockerfile: AuthService/Dockerfile
+    container_name: reploop-auth-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=auth-db;Port=5432;Database=AuthDB;Username=reploop;Password=reploop123
+      JwtSettings__SecretKey: RepLoopBackend-SuperSecret-Key-Min32Chars!!
+      JwtSettings__Issuer: RepLoopBackend
+      JwtSettings__Audience: RepLoopClients
+      JwtSettings__ExpirationMinutes: "60"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: reploop
+      RabbitMQ__Password: reploop123
+    depends_on:
+      - auth-db
+      - rabbitmq
+    restart: unless-stopped
+
+  workout-service:
+    build:
+      context: services
+      dockerfile: WorkoutService/Dockerfile
+    container_name: reploop-workout-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=workout-db;Port=5432;Database=WorkoutDB;Username=reploop;Password=reploop123
+      JwtSettings__SecretKey: RepLoopBackend-SuperSecret-Key-Min32Chars!!
+      JwtSettings__Issuer: RepLoopBackend
+      JwtSettings__Audience: RepLoopClients
+      JwtSettings__ExpirationMinutes: "60"
+    depends_on:
+      - workout-db
+    restart: unless-stopped
+
+  exercise-service:
+    build:
+      context: services
+      dockerfile: ExerciseService/Dockerfile
+    container_name: reploop-exercise-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=exercise-db;Port=5432;Database=ExerciseDB;Username=reploop;Password=reploop123
+      JwtSettings__SecretKey: RepLoopBackend-SuperSecret-Key-Min32Chars!!
+      JwtSettings__Issuer: RepLoopBackend
+      JwtSettings__Audience: RepLoopClients
+      JwtSettings__ExpirationMinutes: "60"
+    depends_on:
+      - exercise-db
+    restart: unless-stopped
+
+  session-service:
+    build:
+      context: services
+      dockerfile: SessionService/Dockerfile
+    container_name: reploop-session-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=session-db;Port=5432;Database=SessionDB;Username=reploop;Password=reploop123
+      JwtSettings__SecretKey: RepLoopBackend-SuperSecret-Key-Min32Chars!!
+      JwtSettings__Issuer: RepLoopBackend
+      JwtSettings__Audience: RepLoopClients
+      JwtSettings__ExpirationMinutes: "60"
+    depends_on:
+      - session-db
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: services
+      dockerfile: UserService/Dockerfile
+    container_name: reploop-user-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=user-db;Port=5432;Database=UserDB;Username=reploop;Password=reploop123
+      JwtSettings__SecretKey: RepLoopBackend-SuperSecret-Key-Min32Chars!!
+      JwtSettings__Issuer: RepLoopBackend
+      JwtSettings__Audience: RepLoopClients
+      JwtSettings__ExpirationMinutes: "60"
+    depends_on:
+      - user-db
+    restart: unless-stopped
+
+  settings-service:
+    build:
+      context: services
+      dockerfile: SettingsService/Dockerfile
+    container_name: reploop-settings-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=settings-db;Port=5432;Database=SettingsDB;Username=reploop;Password=reploop123
+      JwtSettings__SecretKey: RepLoopBackend-SuperSecret-Key-Min32Chars!!
+      JwtSettings__Issuer: RepLoopBackend
+      JwtSettings__Audience: RepLoopClients
+      JwtSettings__ExpirationMinutes: "60"
+    depends_on:
+      - settings-db
+    restart: unless-stopped
+
+  mail-sender:
+    build:
+      context: services
+      dockerfile: MailSenderService/Dockerfile
+    container_name: reploop-mail-sender
+    environment:
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Username: reploop
+      RabbitMQ__Password: reploop123
+      Smtp__Host: mailhog
+      Smtp__Port: "1025"
+      Smtp__From: noreply@reploop.app
+      Smtp__Username: ""
+      Smtp__Password: ""
+    depends_on:
+      - rabbitmq
+      - mailhog
+    restart: unless-stopped

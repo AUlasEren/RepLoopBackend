@@ -42,7 +42,6 @@ appsettings.Local.json
 secrets.json
 
 ## Docker
-.dockerignore
 
 ## macOS
 .DS_Store
