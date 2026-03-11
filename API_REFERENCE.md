@@ -723,6 +723,65 @@ Tüm servisler aynı hata formatını kullanır:
 
 ---
 
+## 8. RecommenderService — `/api/recommendations`
+
+> Python/FastAPI tabanlı içerik bazlı öneri motoru. composite-scoring-v3 algoritması kullanır.
+
+### POST `/api/recommendations/`
+
+**Auth:** -
+
+```json
+// Request
+{
+  "user_id": "guid",
+  "experience_level": "Beginner|Intermediate|Advanced",
+  "goal": "WeightLoss|MuscleGain|Endurance|Flexibility|GeneralFitness"
+}
+
+// Query Params
+// top_n: int (1-20, default 5)
+
+// Response 200
+{
+  "user_id": "guid",
+  "algorithm": "composite-scoring-v3",
+  "recommendations": [
+    {
+      "workout_id": "guid",
+      "workout_name": "string",
+      "description": "string|null",
+      "duration_minutes": 0,
+      "exercise_count": 0,
+      "muscle_groups": ["Chest", "Shoulders"],
+      "score": 0.85,
+      "reason": "string",
+      "tags": ["Orta", "Chest", "60 dk", "6 hareket"]
+    }
+  ]
+}
+```
+
+### Scoring Sinyalleri (v3)
+
+| Sinyal | Ağırlık | Açıklama |
+|--------|---------|----------|
+| Difficulty Match | 0.25 | Egzersiz zorluk dağılımı ile kullanıcı seviyesi uyumu |
+| Muscle Variety | 0.25 | Son 4 günde çalışılan kas gruplarıyla çakışma penaltisi |
+| Duration Match | 0.15 | Antrenman süresi ile seviyeye uygun ideal süre aralığı |
+| Volume Match | 0.15 | Toplam set hacmi ile seviyeye uygun hacim aralığı |
+| Variety | 0.10 | Yakın zamanda yapılmamış workout'lara bonus |
+| Recency Boost | 0.10 | Daha önce tamamlanmış workout'lara bonus |
+
+### GET `/api/recommendations/health`
+
+```json
+// Response 200
+{ "status": "ok", "service": "reploop-recommender" }
+```
+
+---
+
 ## Gateway Route Tablosu
 
 | Route | Servis | Port |
@@ -734,3 +793,4 @@ Tüm servisler aynı hata formatını kullanır:
 | `/api/settings/**` | SettingsService | 5178 |
 | `/api/sessions/**` | SessionService | 5179 |
 | `/api/statistics/**` | StatisticsService | 5180 |
+| `/api/recommendations/**` | RecommenderService | 5181 |
