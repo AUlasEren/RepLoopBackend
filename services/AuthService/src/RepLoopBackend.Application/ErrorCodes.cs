@@ -12,4 +12,8 @@ public static class ErrorCodes
     public const string ChangePasswordFailed    = "AUTH-1007";
     public const string ResetPasswordFailed     = "AUTH-1008";
     public const string InvalidRefreshToken     = "AUTH-1009";
+    public const string ResetPasswordCooldown   = "AUTH-1010";
+    public const string ResetCodeInvalid        = "AUTH-1011";
+    public const string ResetCodeExpired        = "AUTH-1012";
+    public const string ResetCodeMaxAttempts     = "AUTH-1013";
 }

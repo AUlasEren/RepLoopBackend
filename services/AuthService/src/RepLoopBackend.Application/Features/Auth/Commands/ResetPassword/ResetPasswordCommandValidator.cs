@@ -7,7 +7,8 @@ public class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordComm
     public ResetPasswordCommandValidator()
     {
         RuleFor(x => x.Email).NotEmpty().EmailAddress();
-        RuleFor(x => x.Token).NotEmpty();
+        RuleFor(x => x.Code).NotEmpty().Length(6)
+            .WithMessage("Kod 6 haneli olmalıdır.");
         RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(6);
     }
 }
