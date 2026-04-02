@@ -3,6 +3,7 @@ using RepLoopBackend.SharedKernel.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WorkoutService.Application.Features.Workouts.Commands.CreateWorkout;
+using WorkoutService.Application.Features.Workouts.Commands.CreateWorkoutFromTemplate;
 using WorkoutService.Application.Features.Workouts.Commands.DeleteWorkout;
 using WorkoutService.Application.Features.Workouts.Commands.DuplicateWorkout;
 using WorkoutService.Application.Features.Workouts.Commands.UpdateWorkout;
@@ -57,6 +58,15 @@ public class WorkoutsController : ApiControllerBase
         if (id != command.Id) return BadRequest("ID mismatch.");
         await _mediator.Send(command);
         return NoContent();
+    }
+
+    [HttpPost("from-template")]
+    public async Task<IActionResult> CreateFromTemplate(
+        [FromBody] CreateWorkoutFromTemplateCommand command,
+        CancellationToken ct)
+    {
+        var id = await _mediator.Send(command, ct);
+        return CreatedAtAction(nameof(GetById), new { id }, new { id });
     }
 
     [HttpPost("{id:guid}/duplicate")]
