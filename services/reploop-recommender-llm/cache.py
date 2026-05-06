@@ -146,9 +146,14 @@ def get_muscle_frequency(user_id: str) -> tuple[dict, set]:
     return data
 
 
-def discover_cache_key(user_id: str, workout_exercise_ids: set[str]) -> str:
-    """user_id + workout havuzu hash'i — program degisince cache miss olur."""
-    return f"{user_id}:{hash(frozenset(workout_exercise_ids))}"
+def discover_cache_key(
+    user_id: str,
+    workout_exercise_ids: set[str],
+    experience_level: str,
+    goal: str,
+) -> str:
+    """user_id + workout havuzu + profil hash'i — program veya profil degisince cache miss olur."""
+    return f"{user_id}:{experience_level}:{goal}:{hash(frozenset(workout_exercise_ids))}"
 
 
 def get_llm_templates(cache_key: str) -> list[dict] | None:

@@ -84,8 +84,13 @@ def discover_templates(
     muscle_freq, equipment_used = cache.get_muscle_frequency(user_id)
     workout_exercise_ids = cache.get_user_workout_exercise_ids(user_id)
 
-    # 2. Cache key: user_id + program hash (workout degisince miss olur)
-    cache_key = cache.discover_cache_key(user_id, workout_exercise_ids)
+    # 2. Cache key: user_id + program hash + profil (workout veya profil degisince miss olur)
+    cache_key = cache.discover_cache_key(
+        user_id,
+        workout_exercise_ids,
+        profile_raw.get("experience_level", "Beginner"),
+        profile_raw.get("goal", "GeneralFitness"),
+    )
 
     # 3. LLM cache check — varsa hemen don
     cached_templates = cache.get_llm_templates(cache_key)
