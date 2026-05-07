@@ -4,7 +4,7 @@ engine2.py — LLM-destekli antrenman oneri motoru.
 engine.py ile ayni fonksiyon imzasi:
     recommend(user, workouts, top_n, session_history) -> list[dict]
 
-Ollama API uzerinden lokal LLM modeli kullanilir (varsayilan: gemma2:9b).
+Ollama API uzerinden lokal LLM modeli kullanilir (varsayilan: reploop-fitness).
 JSON mode ile yapisal cikti garanti edilir.
 Basarisiz olursa engine.py'nin algorithmic scoring'ine fallback yapar.
 """
@@ -24,7 +24,8 @@ from common import build_tags
 logger = logging.getLogger(__name__)
 
 # Konfigürasyon (env ile override edilebilir)
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma2:9b")
+# Recommend endpoint modeli. Rollback fallback: llama3.2:3b (pre-fine-tune base).
+OLLAMA_MODEL = os.getenv("OLLAMA_RECOMMEND_MODEL", "reploop-fitness")
 LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "2"))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1024"))
 LLM_STREAM = os.getenv("LLM_STREAM", "false").lower() == "true"

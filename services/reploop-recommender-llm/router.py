@@ -63,7 +63,7 @@ def get_recommendations(
 
     return RecommendationResponse(
         user_id=user.user_id,
-        algorithm="llm-gemma2-9b",
+        algorithm=f"llm-{engine.OLLAMA_MODEL}",
         recommendations=recommendations,
     )
 

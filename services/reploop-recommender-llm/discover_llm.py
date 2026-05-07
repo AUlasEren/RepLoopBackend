@@ -1,5 +1,5 @@
 """
-discover_llm.py — LLM katmani (Ollama/gemma2).
+discover_llm.py — LLM katmani (Ollama/reploop-fitness fine-tune).
 
 Pre-filtered 15 exercise + user profile alir,
 3 workout template olusturur (isim, aciklama, exercise sirasi, sets/reps).
@@ -9,11 +9,14 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from typing import Optional
 
 import ollama
 
-from engine2 import OLLAMA_MODEL
+# Discover endpoint modeli. Recommend ile ayri env var — ileride farkli model swap'i icin.
+# Rollback fallback: llama3.2:3b (pre-fine-tune base).
+DISCOVER_MODEL = os.getenv("OLLAMA_DISCOVER_MODEL", "reploop-fitness")
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +103,7 @@ def generate_templates_with_llm(
     user_profile: dict,
 ) -> Optional[list[dict]]:
     """
-    Ollama/gemma2 ile template uret.
+    Ollama/reploop-fitness ile template uret.
     Basarisiz olursa None doner (router fallback'e duser).
     """
     valid_ids = {e["Id"] for e in candidates}
@@ -110,7 +113,7 @@ def generate_templates_with_llm(
     try:
         client = ollama.Client(timeout=_DISCOVER_TIMEOUT)
         response = client.chat(
-            model=OLLAMA_MODEL,
+            model=DISCOVER_MODEL,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},

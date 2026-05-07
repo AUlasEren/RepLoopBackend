@@ -165,8 +165,11 @@ services:
       DB_USER: reploop
       DB_PASSWORD: reploop123
       USE_MOCK_DB: "false"
-      OLLAMA_HOST: http://reploop-ollama:11434
-      OLLAMA_MODEL: llama3.2:3b
+      # Mac/Windows Docker Desktop: host'taki ollama daemon'ina erisim. Linux'ta --add-host gerekir.
+      OLLAMA_HOST: http://host.docker.internal:11434
+      # Hem recommend hem discover endpoint'i fine-tune'u kullanir. Rollback: llama3.2:3b
+      OLLAMA_RECOMMEND_MODEL: ${OLLAMA_RECOMMEND_MODEL:-reploop-fitness}
+      OLLAMA_DISCOVER_MODEL: ${OLLAMA_DISCOVER_MODEL:-reploop-fitness}
     depends_on:
       - workout-db
       - exercise-db
