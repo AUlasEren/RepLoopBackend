@@ -69,6 +69,27 @@ USERS = [
 ]
 
 
+_GOALS = ["MuscleGain", "WeightLoss", "Endurance", "Flexibility", "GeneralFitness"]
+_LEVELS = ["Beginner", "Intermediate", "Advanced"]
+
+
+def discover_users(n: int) -> list[dict]:
+    """Discover stress icin n adet user; USERS'i tekrar et + synthetic UUID'lerle genislet."""
+    out = list(USERS)
+    while len(out) < n:
+        i = len(out) + 1
+        out.append({
+            "label": f"synthetic-stress-{i:02d}",
+            "user_id": f"00000000-0000-0000-0000-{i:012d}",
+            "age": 25 + (i % 30),
+            "weight_kg": 60.0 + (i % 40),
+            "height_cm": 165.0 + (i % 25),
+            "experience_level": _LEVELS[i % len(_LEVELS)],
+            "goal": _GOALS[i % len(_GOALS)],
+        })
+    return out[:n]
+
+
 # ---------------------------------------------------------------------------
 # HTTP helpers (stdlib only)
 # ---------------------------------------------------------------------------
@@ -220,9 +241,9 @@ def run_recommend(base: str, expected_algorithm: str, timeout: float) -> tuple[i
     return pass_count, len(USERS)
 
 
-def run_discover(base: str, exercise_db_ids: set[str] | None, timeout: float,
-                 round_label: str = "round 1") -> tuple[int, int, list[str]]:
-    print(f"\n=== GET /api/recommendations/discover ({round_label}, {len(USERS)} requests) ===")
+def run_discover(base: str, users: list[dict], exercise_db_ids: set[str] | None,
+                 timeout: float, round_label: str = "round 1") -> tuple[int, int, list[str]]:
+    print(f"\n=== GET /api/recommendations/discover ({round_label}, {len(users)} requests) ===")
     if exercise_db_ids is not None:
         print(f"    ExerciseDB UUID dogrulama aktif ({len(exercise_db_ids)} ID yuklendi)")
     else:
@@ -230,7 +251,7 @@ def run_discover(base: str, exercise_db_ids: set[str] | None, timeout: float,
     print()
     pass_count = 0
     generated_by_summary: list[str] = []
-    for u in USERS:
+    for u in users:
         url = f"{base}/api/recommendations/discover?user_id={urllib.parse.quote(u['user_id'])}"
         r = get(url, timeout=timeout)
         if not r.ok:
@@ -249,7 +270,28 @@ def run_discover(base: str, exercise_db_ids: set[str] | None, timeout: float,
                 print(f"         - {err}")
             if len(errors) > 5:
                 print(f"         ... {len(errors) - 5} more errors")
-    return pass_count, len(USERS), generated_by_summary
+    return pass_count, len(users), generated_by_summary
+
+
+def dump_discover_logs(since_seconds: int = 600) -> None:
+    """Recommender container'indan son N saniyenin Discover LLM log'larini dump et."""
+    print(f"\n=== docker logs reploop-recommender-service (Discover LLM/retry, last {since_seconds}s) ===")
+    try:
+        r = subprocess.run(
+            ["docker", "logs", "--since", f"{since_seconds}s", "reploop-recommender-service"],
+            capture_output=True, text=True, timeout=10,
+        )
+        lines = (r.stdout + r.stderr).split("\n")
+        keywords = ("Discover LLM", "succeeded on attempt", "denemede basarisiz",
+                    "LLM enrichment", "Returning cached LLM")
+        filtered = [l for l in lines if any(k in l for k in keywords)]
+        if not filtered:
+            print("  (no matching log lines)")
+            return
+        for line in filtered[-50:]:  # last 50
+            print(f"  {line}")
+    except Exception as e:
+        print(f"  [WARN] log dump failed: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -267,7 +309,11 @@ def main() -> int:
     ap.add_argument("--discover-timeout", type=float, default=30.0,
                     help="Discover endpoint timeout (sn). Default: 30 (algorithmic hizli)")
     ap.add_argument("--check-llm-cache", action="store_true",
-                    help="Discover round 2: 75s bekle, LLM cache hit ('generated_by'='llm') bekle")
+                    help="Discover round 2: --cache-wait sn bekle, LLM cache hit ('generated_by'='llm') bekle")
+    ap.add_argument("--discover-runs", type=int, default=10,
+                    help="Discover endpoint'ine sequential request sayisi (default: 10, daemon stress test)")
+    ap.add_argument("--cache-wait", type=int, default=120,
+                    help="--check-llm-cache modu icin background LLM enrichment bekleme suresi (sn). Default: 120")
     args = ap.parse_args()
 
     base = args.base.rstrip("/")
@@ -294,31 +340,44 @@ def main() -> int:
     # Recommend
     rec_pass, rec_total = run_recommend(base, expected_algorithm, args.recommend_timeout)
 
-    # Discover round 1
-    dis1_pass, dis1_total, gb1 = run_discover(base, ex_ids, args.discover_timeout, "round 1")
+    # Discover round 1 (stress test)
+    discover_user_list = discover_users(args.discover_runs)
+    dis1_pass, dis1_total, gb1 = run_discover(base, discover_user_list, ex_ids,
+                                              args.discover_timeout, f"round 1, {args.discover_runs} stress")
 
     # Optional discover round 2
     dis2_pass, dis2_total, gb2 = 0, 0, []
     if args.check_llm_cache:
-        wait = 75
-        print(f"\n=== Sleeping {wait}s for background LLM enrichment ===")
-        time.sleep(wait)
-        dis2_pass, dis2_total, gb2 = run_discover(base, ex_ids, args.discover_timeout, "round 2 (LLM cache)")
+        print(f"\n=== Sleeping {args.cache_wait}s for background LLM enrichment ({args.discover_runs} parallel threads) ===")
+        time.sleep(args.cache_wait)
+        dis2_pass, dis2_total, gb2 = run_discover(base, discover_user_list, ex_ids,
+                                                  args.discover_timeout, "round 2 (LLM cache)")
+
+    # Server-side log dump (retry/attempt analizi icin)
+    dump_discover_logs(since_seconds=600)
 
     # Summary
     print("\n" + "=" * 60)
     print("SUMMARY")
     print("=" * 60)
     print(f"  Recommend:        {rec_pass}/{rec_total} PASS")
-    print(f"  Discover round 1: {dis1_pass}/{dis1_total} PASS  generated_by={gb1}")
+    print(f"  Discover round 1: {dis1_pass}/{dis1_total} PASS  ({args.discover_runs} sequential)")
+    print(f"                    generated_by={gb1}")
     if args.check_llm_cache:
         llm_count = sum(1 for g in gb2 if g == "llm")
-        print(f"  Discover round 2: {dis2_pass}/{dis2_total} PASS  generated_by={gb2}  llm_count={llm_count}")
+        print(f"  Discover round 2: {dis2_pass}/{dis2_total} PASS  llm_count={llm_count}/{dis2_total}")
+        print(f"                    generated_by={gb2}")
     print("=" * 60)
 
     overall = (rec_pass == rec_total) and (dis1_pass == dis1_total)
     if args.check_llm_cache:
         overall = overall and (dis2_pass == dis2_total)
+        # User explicit: %100 LLM cevap bekleniyor (fallback yok). round 2 gb2'de hepsi "llm" olmali.
+        llm_count = sum(1 for g in gb2 if g == "llm")
+        if llm_count < len(gb2):
+            print(f"\n  [WARN] Discover round 2: {len(gb2) - llm_count}/{len(gb2)} request fallback'e dustu")
+            print(f"         %100 LLM cevap bekleniyordu — daemon stability sorunu olabilir.")
+            overall = False
     return 0 if overall else 1
 
 

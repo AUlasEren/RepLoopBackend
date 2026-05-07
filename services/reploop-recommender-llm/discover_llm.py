@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 _DISCOVER_TIMEOUT = 180.0   # saniye — Docker CPU inference icin
 _DISCOVER_MAX_TOKENS = 2048  # 3 template JSON icin yeterli
+_DISCOVER_RETRIES = 2        # engine2.recommend ile parity — flaky Ollama runner'a karsi
 
 SYSTEM_PROMPT = """\
 Sen bir kisisel antrenor asistanisin.
@@ -104,26 +105,34 @@ def generate_templates_with_llm(
 ) -> Optional[list[dict]]:
     """
     Ollama/reploop-fitness ile template uret.
-    Basarisiz olursa None doner (router fallback'e duser).
+    _DISCOVER_RETRIES kez dener; hepsi basarisiz olursa None doner (router fallback'e duser).
     """
     valid_ids = {e["Id"] for e in candidates}
     candidate_map = {e["Id"]: e for e in candidates}
     user_prompt = _build_user_prompt(candidates, user_profile)
 
-    try:
-        client = ollama.Client(timeout=_DISCOVER_TIMEOUT)
-        response = client.chat(
-            model=DISCOVER_MODEL,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt},
-            ],
-            format="json",
-            options={"num_predict": _DISCOVER_MAX_TOKENS},
-        )
-        raw_text = response["message"]["content"]
-    except Exception as e:
-        logger.warning("Discover LLM call failed: %s", e)
+    raw_text: str | None = None
+    for attempt in range(1, _DISCOVER_RETRIES + 1):
+        try:
+            client = ollama.Client(timeout=_DISCOVER_TIMEOUT)
+            response = client.chat(
+                model=DISCOVER_MODEL,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                format="json",
+                options={"num_predict": _DISCOVER_MAX_TOKENS},
+            )
+            raw_text = response["message"]["content"]
+            if attempt > 1:
+                logger.info("Discover LLM call succeeded on attempt %d/%d", attempt, _DISCOVER_RETRIES)
+            break
+        except Exception as e:
+            logger.warning("Discover LLM call failed (attempt %d/%d): %s", attempt, _DISCOVER_RETRIES, e)
+
+    if raw_text is None:
+        logger.warning("Discover LLM %d denemede basarisiz, fallback'e dusuyor", _DISCOVER_RETRIES)
         return None
 
     # JSON parse
