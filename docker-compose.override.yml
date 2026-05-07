@@ -145,8 +145,10 @@ services:
 
   recommender-service:
     build:
-      context: services/reploop-recommender
+      context: services/reploop-recommender-llm
     container_name: reploop-recommender-service
+    ports:
+      - "5181:8000"
     environment:
       WORKOUT_DB_HOST: workout-db
       WORKOUT_DB_PORT: "5432"
@@ -157,13 +159,19 @@ services:
       SESSION_DB_HOST: session-db
       SESSION_DB_PORT: "5432"
       SESSION_DB_NAME: SessionDB
+      USER_DB_HOST: user-db
+      USER_DB_PORT: "5432"
+      USER_DB_NAME: UserDB
       DB_USER: reploop
       DB_PASSWORD: reploop123
       USE_MOCK_DB: "false"
+      OLLAMA_HOST: http://reploop-ollama:11434
+      OLLAMA_MODEL: llama3.2:3b
     depends_on:
       - workout-db
       - exercise-db
       - session-db
+      - user-db
     restart: unless-stopped
 
   mail-sender:
@@ -175,12 +183,11 @@ services:
       RabbitMQ__Host: rabbitmq
       RabbitMQ__Username: reploop
       RabbitMQ__Password: reploop123
-      Smtp__Host: mailhog
-      Smtp__Port: "1025"
-      Smtp__From: noreply@reploop.app
-      Smtp__Username: ""
-      Smtp__Password: ""
+      Smtp__Host: smtp.resend.com
+      Smtp__Port: "465"
+      Smtp__From: onboarding@resend.dev
+      Smtp__Username: resend
+      Smtp__Password: "${SMTP_PASSWORD:?SMTP_PASSWORD env var is required (see .env.example)}"
     depends_on:
       - rabbitmq
-      - mailhog
     restart: unless-stopped
