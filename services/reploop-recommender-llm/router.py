@@ -91,6 +91,10 @@ def discover_templates(
         profile_raw.get("experience_level", "Beginner"),
         profile_raw.get("goal", "GeneralFitness"),
     )
+    logger.info(
+        "Discover request user=%s level=%s goal=%s cache_key=%s",
+        user_id, profile_raw.get("experience_level"), profile_raw.get("goal"), cache_key,
+    )
 
     # 3. LLM cache check — varsa hemen don
     cached_templates = cache.get_llm_templates(cache_key)
