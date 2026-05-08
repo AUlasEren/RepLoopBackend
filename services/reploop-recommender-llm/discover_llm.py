@@ -20,7 +20,7 @@ DISCOVER_MODEL = os.getenv("OLLAMA_DISCOVER_MODEL", "reploop-fitness")
 
 logger = logging.getLogger(__name__)
 
-_DISCOVER_TIMEOUT = 180.0   # saniye — Docker CPU inference icin
+_DISCOVER_TIMEOUT = 300.0   # saniye — Docker CPU inference + paralel queue (5-10 thread) icin
 _DISCOVER_MAX_TOKENS = 2048  # 3 template JSON icin yeterli
 _DISCOVER_RETRIES = 2        # engine2.recommend ile parity — flaky Ollama runner'a karsi
 
