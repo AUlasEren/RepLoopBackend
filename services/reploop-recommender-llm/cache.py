@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 _WORKOUT_TTL = 300          # 5 dakika
 _SESSION_TTL = 60           # 1 dakika
 _PUBLIC_EXERCISE_TTL = 1800 # 30 dakika
-_USER_PROFILE_TTL = 300     # 5 dakika
 _MUSCLE_FREQ_TTL = 60       # 1 dakika
 _WORKOUT_EX_IDS_TTL = 60    # 1 dakika
 _LLM_TEMPLATE_TTL = 1800   # 30 dakika
@@ -21,7 +20,6 @@ _lock = threading.Lock()
 _workout_cache: dict[str, tuple[list[dict], float]] = {}
 _session_cache: dict[str, tuple[list[dict], float]] = {}
 _public_exercise_cache: dict[str, tuple[list[dict], float]] = {}
-_user_profile_cache: dict[str, tuple[dict, float]] = {}
 _muscle_freq_cache: dict[str, tuple[tuple[dict, set], float]] = {}
 _workout_ex_ids_cache: dict[str, tuple[set[str], float]] = {}
 _llm_template_cache: dict[str, tuple[list[dict], float]] = {}
@@ -109,22 +107,9 @@ def get_user_workout_exercise_ids(user_id: str) -> set[str]:
 
 
 def get_user_profile(user_id: str) -> dict:
-    """User profile verisini TTL cache ile dondur (user bazli, 5dk)."""
-    key = user_id
-
-    with _lock:
-        if key in _user_profile_cache:
-            value, ts = _user_profile_cache[key]
-            if time.time() - ts < _USER_PROFILE_TTL:
-                logger.debug("User profile cache hit (key=%s)", key)
-                return value
-
-    data = database.get_user_profile(user_id)
-
-    with _lock:
-        _user_profile_cache[key] = (data, time.time())
-
-    return data
+    """User profile verisini DB'den cek. Cache YOK — profil guncellemesi
+    discover cache key'ine aninda yansisin (yoksa 5dk stale window olusur)."""
+    return database.get_user_profile(user_id)
 
 
 def get_muscle_frequency(user_id: str) -> tuple[dict, set]:
