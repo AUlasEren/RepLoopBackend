@@ -26,7 +26,6 @@ public class ExercisesManager
             MuscleGroup = command.MuscleGroup,
             Equipment = command.Equipment,
             Difficulty = command.Difficulty,
-            VideoUrl = command.VideoUrl,
             ImageUrl = command.ImageUrl,
             IsPublic = command.IsPublic,
             CreatedByUserId = userId
@@ -50,7 +49,6 @@ public class ExercisesManager
         exercise.MuscleGroup = command.MuscleGroup;
         exercise.Equipment = command.Equipment;
         exercise.Difficulty = command.Difficulty;
-        exercise.VideoUrl = command.VideoUrl;
         exercise.ImageUrl = command.ImageUrl;
         exercise.IsPublic = command.IsPublic;
         exercise.UpdatedAt = DateTime.UtcNow;
@@ -101,7 +99,6 @@ public class ExercisesManager
                 MuscleGroup = e.MuscleGroup,
                 Equipment = e.Equipment,
                 Difficulty = e.Difficulty,
-                VideoUrl = e.VideoUrl,
                 ImageUrl = e.ImageUrl,
                 IsPublic = e.IsPublic,
                 CreatedAt = e.CreatedAt
@@ -125,7 +122,6 @@ public class ExercisesManager
             MuscleGroup = e.MuscleGroup,
             Equipment = e.Equipment,
             Difficulty = e.Difficulty,
-            VideoUrl = e.VideoUrl,
             ImageUrl = e.ImageUrl,
             IsPublic = e.IsPublic,
             CreatedAt = e.CreatedAt

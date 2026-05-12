@@ -9,7 +9,6 @@ public record CreateExerciseCommand : IRequest<Guid>
     public string? MuscleGroup { get; init; }
     public string? Equipment { get; init; }
     public string? Difficulty { get; init; }
-    public string? VideoUrl { get; init; }
     public string? ImageUrl { get; init; }
     public bool IsPublic { get; init; } = true;
 }

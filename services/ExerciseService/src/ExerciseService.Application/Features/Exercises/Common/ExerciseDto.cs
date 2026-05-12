@@ -8,7 +8,6 @@ public class ExerciseDto
     public string? MuscleGroup { get; set; }
     public string? Equipment { get; set; }
     public string? Difficulty { get; set; }
-    public string? VideoUrl { get; set; }
     public string? ImageUrl { get; set; }
     public bool IsPublic { get; set; }
     public DateTime CreatedAt { get; set; }
