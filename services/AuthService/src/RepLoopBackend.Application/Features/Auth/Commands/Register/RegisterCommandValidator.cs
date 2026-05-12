@@ -7,15 +7,16 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
     public RegisterCommandValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty()
-            .EmailAddress();
+            .NotEmpty().WithMessage("E-posta adresi zorunludur.")
+            .EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.");
 
         RuleFor(x => x.Password)
-            .NotEmpty()
-            .MinimumLength(8);
+            .NotEmpty().WithMessage("Şifre zorunludur.")
+            .MinimumLength(8).WithMessage("Şifre en az 8 karakter olmalıdır.");
 
         RuleFor(x => x.DisplayName)
-            .NotEmpty()
-            .MaximumLength(100);
+            .NotEmpty().WithMessage("Ad zorunludur.")
+            .MinimumLength(2).WithMessage("Ad en az 2 karakter olmalıdır.")
+            .MaximumLength(100).WithMessage("Ad en fazla 100 karakter olabilir.");
     }
 }

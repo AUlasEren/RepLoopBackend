@@ -7,10 +7,10 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
     public LoginCommandValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty()
-            .EmailAddress();
+            .NotEmpty().WithMessage("E-posta adresi zorunludur.")
+            .EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.");
 
         RuleFor(x => x.Password)
-            .NotEmpty();
+            .NotEmpty().WithMessage("Şifre zorunludur.");
     }
 }

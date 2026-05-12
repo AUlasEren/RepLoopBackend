@@ -7,7 +7,7 @@ public class ForgotPasswordCommandValidator : AbstractValidator<ForgotPasswordCo
     public ForgotPasswordCommandValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty()
-            .EmailAddress();
+            .NotEmpty().WithMessage("E-posta adresi zorunludur.")
+            .EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.");
     }
 }

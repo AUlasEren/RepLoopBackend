@@ -7,6 +7,6 @@ public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenComman
     public RefreshTokenCommandValidator()
     {
         RuleFor(x => x.RefreshToken)
-            .NotEmpty();
+            .NotEmpty().WithMessage("Refresh token zorunludur.");
     }
 }

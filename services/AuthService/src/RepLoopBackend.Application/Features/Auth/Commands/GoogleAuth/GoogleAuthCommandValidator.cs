@@ -6,6 +6,7 @@ public class GoogleAuthCommandValidator : AbstractValidator<GoogleAuthCommand>
 {
     public GoogleAuthCommandValidator()
     {
-        RuleFor(x => x.IdToken).NotEmpty();
+        RuleFor(x => x.IdToken)
+            .NotEmpty().WithMessage("Google ID token zorunludur.");
     }
 }

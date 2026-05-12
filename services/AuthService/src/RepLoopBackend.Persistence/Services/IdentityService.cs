@@ -50,12 +50,12 @@ public class IdentityService : IIdentityService
         var user = await _userManager.FindByEmailAsync(email);
 
         if (user == null)
-            return (false, "Invalid credentials.", null);
+            return (false, "E-posta veya şifre hatalı.", null);
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
 
         if (!result.Succeeded)
-            return (false, "Invalid credentials.", null);
+            return (false, "E-posta veya şifre hatalı.", null);
 
         return (true, null, ToUserInfo(user));
     }

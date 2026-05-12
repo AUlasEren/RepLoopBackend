@@ -24,7 +24,8 @@ public static class DependencyInjection
             opts.Password.RequireUppercase = false;
         })
         .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddDefaultTokenProviders();
+        .AddDefaultTokenProviders()
+        .AddErrorDescriber<TurkishIdentityErrorDescriber>();
 
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IPasswordResetCodeStore, PasswordResetCodeStore>();

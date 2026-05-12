@@ -6,7 +6,13 @@ public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCo
 {
     public ChangePasswordCommandValidator()
     {
-        RuleFor(x => x.CurrentPassword).NotEmpty();
-        RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(6);
+        RuleFor(x => x.CurrentPassword)
+            .NotEmpty().WithMessage("Mevcut şifre zorunludur.");
+
+        RuleFor(x => x.NewPassword)
+            .NotEmpty().WithMessage("Yeni şifre zorunludur.")
+            .MinimumLength(8).WithMessage("Yeni şifre en az 8 karakter olmalıdır.")
+            .NotEqual(x => x.CurrentPassword)
+                .WithMessage("Yeni şifre, mevcut şifreden farklı olmalıdır.");
     }
 }

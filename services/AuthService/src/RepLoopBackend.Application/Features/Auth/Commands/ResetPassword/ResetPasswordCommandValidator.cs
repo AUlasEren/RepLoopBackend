@@ -6,9 +6,16 @@ public class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordComm
 {
     public ResetPasswordCommandValidator()
     {
-        RuleFor(x => x.Email).NotEmpty().EmailAddress();
-        RuleFor(x => x.Code).NotEmpty().Length(6)
-            .WithMessage("Kod 6 haneli olmalıdır.");
-        RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(6);
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("E-posta adresi zorunludur.")
+            .EmailAddress().WithMessage("Geçerli bir e-posta adresi giriniz.");
+
+        RuleFor(x => x.Code)
+            .NotEmpty().WithMessage("Kod zorunludur.")
+            .Matches(@"^\d{6}$").WithMessage("Kod 6 haneli rakamlardan oluşmalıdır.");
+
+        RuleFor(x => x.NewPassword)
+            .NotEmpty().WithMessage("Yeni şifre zorunludur.")
+            .MinimumLength(8).WithMessage("Yeni şifre en az 8 karakter olmalıdır.");
     }
 }

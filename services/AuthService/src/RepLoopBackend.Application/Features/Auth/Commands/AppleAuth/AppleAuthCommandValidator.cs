@@ -6,6 +6,7 @@ public class AppleAuthCommandValidator : AbstractValidator<AppleAuthCommand>
 {
     public AppleAuthCommandValidator()
     {
-        RuleFor(x => x.IdentityToken).NotEmpty();
+        RuleFor(x => x.IdentityToken)
+            .NotEmpty().WithMessage("Apple identity token zorunludur.");
     }
 }
